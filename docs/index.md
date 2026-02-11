@@ -9,7 +9,7 @@ title: Fun Notes
 <div class="notes-grid">
   {% assign sorted_notes = site.notes | sort: "date" | reverse %}
   {% for note in sorted_notes %}
-  <a href="{{ note.url }}" class="note-card">
+  <a href="{{ site.baseurl }}{{ note.url }}" class="note-card">
     <h2>{{ note.title }}</h2>
     <div class="meta">
       {{ note.date | date: "%b %d, %Y" }}
