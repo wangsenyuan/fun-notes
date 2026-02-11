@@ -28,6 +28,8 @@ Open http://localhost:4000/fun-notes/
 
 ## Deploy to GitHub Pages
 
-1. Push to GitHub
-2. Settings → Pages → Source: `main` branch, `/docs` folder
+Uses GitHub Actions to build and deploy.
+
+1. Push to `main` — the workflow builds Jekyll from `docs/` and deploys
+2. **Settings → Pages → Source**: Set to **GitHub Actions** (required for Actions deployment)
 3. Site: https://wangsenyuan.github.io/fun-notes/
