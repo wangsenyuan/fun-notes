@@ -1,23 +1,33 @@
 # fun-notes
 
-This repository now includes a simple GitHub Pages site (static) that acts as a personal notes app which remembers notes in your browser.
+Notes on tech, Java, algorithms, and more — hosted on GitHub Pages.
 
-Usage
- - Open the site locally by opening [docs/index.html](docs/index.html) in a browser.
- - The app stores notes in `localStorage` so they persist in your browser.
+## Add a note
 
-Deploy to GitHub Pages
- - Commit and push the repo to GitHub.
- - In your repository Settings -> Pages, set Source to `main` (or `master`) and the `docs/` folder, then save.
- - The site will be available at `https://<your-username>.github.io/<repo>/` after a minute.
+Create a markdown file in `docs/_notes/` with front matter:
 
-Quick commands
-```bash
-git add docs README.md
-git commit -m "Add GitHub Pages notes app"
-git push origin main
+```markdown
+---
+title: Your Note Title
+tags: java, algorithm, tech
+date: 2025-02-11
+---
+
+Your content here...
 ```
 
-Notes & next steps
- - Notes are stored locally in your browser; to sync across devices, connect a remote backend (ask me if you want that).
- - You can export/import notes as JSON using the UI.
+## Run locally
+
+```bash
+cd docs
+bundle install
+bundle exec jekyll serve
+```
+
+Open http://localhost:4000/fun-notes/
+
+## Deploy to GitHub Pages
+
+1. Push to GitHub
+2. Settings → Pages → Source: `main` branch, `/docs` folder
+3. Site: https://wangsenyuan.github.io/fun-notes/

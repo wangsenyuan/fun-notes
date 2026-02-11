@@ -1,0 +1,16 @@
+title: Fun Notes
+description: Notes on tech, Java, algorithms, and more
+baseurl: "/fun-notes"
+url: "https://wangsenyuan.github.io"
+
+collections:
+  notes:
+    output: true
+    permalink: /notes/:name/
+
+defaults:
+  - scope:
+      path: ""
+      type: notes
+    values:
+      layout: note
