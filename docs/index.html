@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Notes — GitHub Pages</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Notes</h1>
+    <p>Quick notes that remember things in your browser.</p>
+  </header>
+
+  <main>
+    <section class="editor">
+      <input id="note-title" placeholder="Title" />
+      <input id="note-tags" placeholder="Tags (comma separated)" />
+      <textarea id="note-body" placeholder="Write your note here..."></textarea>
+      <div class="controls">
+        <button id="save-note">Save</button>
+        <button id="new-note">New</button>
+        <button id="export-notes">Export</button>
+        <input id="import-file" type="file" accept="application/json" style="display:none" />
+        <button id="import-notes">Import</button>
+      </div>
+    </section>
+
+    <aside class="list">
+      <input id="search" placeholder="Search notes or tags" />
+      <ul id="notes-list"></ul>
+    </aside>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
