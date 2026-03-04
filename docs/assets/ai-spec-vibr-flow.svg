@@ -1,0 +1,173 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 640" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="10" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#6366f1"/>
+    </marker>
+    <marker id="arrow-gray" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="10" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#94a3b8"/>
+    </marker>
+    <marker id="arrow-amber" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="10" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#f59e0b"/>
+    </marker>
+    <linearGradient id="grad-phase1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ede9fe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ddd6fe;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad-phase2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e0f2fe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#bae6fd;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad-phase3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d1fae5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a7f3d0;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad-base" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fef3c7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fde68a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="640" rx="12" fill="#1e1b2e"/>
+
+  <!-- Title -->
+  <text x="450" y="36" text-anchor="middle" fill="#e2e0f0" font-size="18" font-weight="bold">AI-Assisted Spec-Driven Coding Flow</text>
+
+  <!-- ==================== Foundation Layer ==================== -->
+  <rect x="30" y="490" width="850" height="130" rx="16" fill="url(#grad-base)" opacity="0.12" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="450" y="515" text-anchor="middle" fill="#fcd34d" font-size="13" font-weight="bold">Foundation — AI 基础能力层</text>
+
+  <!-- Agent Skills -->
+  <rect x="50" y="530" width="380" height="75" rx="10" fill="#92400e" opacity="0.75"/>
+  <text x="240" y="553" text-anchor="middle" fill="#fef3c7" font-size="12" font-weight="bold">Agent Skills</text>
+  <text x="240" y="572" text-anchor="middle" fill="#fde68a" font-size="10">Coding Style · Service Guideline · 架构约束</text>
+  <text x="240" y="590" text-anchor="middle" fill="#fde68a" font-size="10">业务领域知识 · Spec 模板 · Prompt 库</text>
+
+  <!-- MCP Server -->
+  <rect x="470" y="530" width="390" height="75" rx="10" fill="#92400e" opacity="0.75"/>
+  <text x="665" y="553" text-anchor="middle" fill="#fef3c7" font-size="12" font-weight="bold">MCP Server（外部系统集成）</text>
+  <text x="665" y="572" text-anchor="middle" fill="#fde68a" font-size="10">需求 ID → 拉取详情 · 获取设计资源</text>
+  <text x="665" y="590" text-anchor="middle" fill="#fde68a" font-size="10">更新需求状态 · 同步进度到项目管理平台</text>
+
+  <!-- Upward arrows from Foundation to Phase 1 -->
+  <path d="M 200,530 Q 200,480 200,460" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow-amber)"/>
+  <text x="175" y="478" text-anchor="middle" fill="#fbbf24" font-size="9" transform="rotate(-90, 175, 478)">供给</text>
+
+  <!-- Upward arrows from Foundation to Phase 2 -->
+  <path d="M 585,530 Q 585,480 585,460" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow-amber)"/>
+  <text x="560" y="478" text-anchor="middle" fill="#fbbf24" font-size="9" transform="rotate(-90, 560, 478)">供给</text>
+
+
+  <!-- ==================== Phase 1: Dev + AI Cycle ==================== -->
+  <rect x="30" y="55" width="400" height="400" rx="16" fill="url(#grad-phase1)" opacity="0.15" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="230" y="80" text-anchor="middle" fill="#c4b5fd" font-size="13" font-weight="bold">Phase 1 — 研发 + AI 协作（循环迭代）</text>
+
+  <!-- Circular layout for 3 steps -->
+  <!-- Step 0: Spec 起草 (top) -->
+  <rect x="130" y="100" width="200" height="70" rx="12" fill="#7c3aed" opacity="0.85"/>
+  <text x="230" y="128" text-anchor="middle" fill="#fff" font-size="13" font-weight="bold">0. 需求 → Spec 起草</text>
+  <text x="230" y="148" text-anchor="middle" fill="#ddd6fe" font-size="11">场景澄清 · 规范评审</text>
+
+  <!-- Step 1: Vibr Coding (bottom-right) -->
+  <rect x="290" y="240" width="200" height="70" rx="12" fill="#7c3aed" opacity="0.85"/>
+  <text x="390" y="268" text-anchor="middle" fill="#fff" font-size="13" font-weight="bold">1. Vibr Coding 实现</text>
+  <text x="390" y="288" text-anchor="middle" fill="#ddd6fe" font-size="11">AI IDE · 纯函数 · 人类主导</text>
+
+  <!-- Step 2: Test (bottom-left) -->
+  <rect x="30" y="240" width="200" height="70" rx="12" fill="#7c3aed" opacity="0.85"/>
+  <text x="130" y="268" text-anchor="middle" fill="#fff" font-size="13" font-weight="bold">2. 测试与验证</text>
+  <text x="130" y="288" text-anchor="middle" fill="#ddd6fe" font-size="11">Spec 驱动 · 合同测试</text>
+
+  <!-- Circular arrows: 0 → 1 -->
+  <path d="M 330,155 Q 370,190 360,235" fill="none" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
+  <!-- Circular arrows: 1 → 2 -->
+  <path d="M 290,290 Q 250,330 230,305" fill="none" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
+  <!-- Circular arrows: 2 → 0 -->
+  <path d="M 80,240 Q 70,190 130,155" fill="none" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Cycle label -->
+  <text x="215" y="225" text-anchor="middle" fill="#a78bfa" font-size="20">↻</text>
+  <text x="215" y="210" text-anchor="middle" fill="#a78bfa" font-size="10">迭代循环</text>
+
+  <!-- Human + AI labels -->
+  <rect x="80" y="370" width="90" height="30" rx="8" fill="#4c1d95" opacity="0.7"/>
+  <text x="125" y="390" text-anchor="middle" fill="#ddd6fe" font-size="11">👤 开发人员</text>
+  <rect x="195" y="370" width="90" height="30" rx="8" fill="#4c1d95" opacity="0.7"/>
+  <text x="240" y="390" text-anchor="middle" fill="#ddd6fe" font-size="11">🤖 AI 助理</text>
+  <text x="310" y="390" text-anchor="middle" fill="#7c3aed" font-size="12" font-weight="bold">协作</text>
+
+  <!-- Responsibility note -->
+  <text x="230" y="430" text-anchor="middle" fill="#94a3b8" font-size="10" font-style="italic">开发人员是责任人，AI 是高效助理</text>
+
+  <!-- ==================== Arrow Phase 1 → Phase 2 ==================== -->
+  <text x="460" y="215" text-anchor="middle" fill="#94a3b8" font-size="11">提交 PR</text>
+  <line x1="430" y1="225" x2="480" y2="225" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow-gray)"/>
+
+  <!-- ==================== Phase 2: CI/CD ==================== -->
+  <rect x="490" y="55" width="190" height="400" rx="16" fill="url(#grad-phase2)" opacity="0.15" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="585" y="80" text-anchor="middle" fill="#7dd3fc" font-size="13" font-weight="bold">Phase 2 — CI/CD 质量门</text>
+
+  <!-- CI/CD pipeline steps (vertical) -->
+  <rect x="510" y="100" width="150" height="42" rx="8" fill="#0369a1" opacity="0.8"/>
+  <text x="585" y="118" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Coding Style 检查</text>
+  <text x="585" y="133" text-anchor="middle" fill="#bae6fd" font-size="9">ESLint · Prettier · 风格规范</text>
+
+  <line x1="585" y1="142" x2="585" y2="155" stroke="#0ea5e9" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="510" y="158" width="150" height="42" rx="8" fill="#0369a1" opacity="0.8"/>
+  <text x="585" y="176" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Spec Check</text>
+  <text x="585" y="191" text-anchor="middle" fill="#bae6fd" font-size="9">Spec Lint · Breaking Change</text>
+
+  <line x1="585" y1="200" x2="585" y2="213" stroke="#0ea5e9" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="510" y="216" width="150" height="42" rx="8" fill="#0369a1" opacity="0.8"/>
+  <text x="585" y="234" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">单元 / 集成测试</text>
+  <text x="585" y="249" text-anchor="middle" fill="#bae6fd" font-size="9">覆盖率 · 合同测试</text>
+
+  <line x1="585" y1="258" x2="585" y2="271" stroke="#0ea5e9" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="510" y="274" width="150" height="42" rx="8" fill="#0369a1" opacity="0.8"/>
+  <text x="585" y="292" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Sonar 评分</text>
+  <text x="585" y="307" text-anchor="middle" fill="#bae6fd" font-size="9">代码质量 · 安全扫描</text>
+
+  <line x1="585" y1="316" x2="585" y2="329" stroke="#0ea5e9" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="510" y="332" width="150" height="42" rx="8" fill="#0369a1" opacity="0.8"/>
+  <text x="585" y="350" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">AI Review</text>
+  <text x="585" y="365" text-anchor="middle" fill="#bae6fd" font-size="9">语义审查 · 风险标记</text>
+
+  <!-- Fail → back to Phase 1 -->
+  <path d="M 510,395 Q 460,430 400,410" fill="none" stroke="#f87171" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+  <text x="465" y="425" text-anchor="middle" fill="#f87171" font-size="10">未通过 → 返回修改</text>
+
+  <!-- Pass label -->
+  <text x="585" y="400" text-anchor="middle" fill="#4ade80" font-size="11" font-weight="bold">✓ 全部通过</text>
+
+  <!-- ==================== Arrow Phase 2 → Phase 3 ==================== -->
+  <line x1="680" y1="270" x2="720" y2="270" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow-gray)"/>
+  <text x="700" y="260" text-anchor="middle" fill="#94a3b8" font-size="11">合并</text>
+
+  <!-- ==================== Phase 3: Release ==================== -->
+  <rect x="730" y="55" width="150" height="400" rx="16" fill="url(#grad-phase3)" opacity="0.15" stroke="#10b981" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="805" y="80" text-anchor="middle" fill="#6ee7b7" font-size="13" font-weight="bold">Phase 3 — 发布上线</text>
+
+  <rect x="750" y="130" width="110" height="45" rx="8" fill="#047857" opacity="0.8"/>
+  <text x="805" y="150" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">构建打包</text>
+  <text x="805" y="165" text-anchor="middle" fill="#a7f3d0" font-size="9">Build · Docker</text>
+
+  <line x1="805" y1="175" x2="805" y2="195" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="750" y="200" width="110" height="45" rx="8" fill="#047857" opacity="0.8"/>
+  <text x="805" y="220" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">部署</text>
+  <text x="805" y="235" text-anchor="middle" fill="#a7f3d0" font-size="9">Staging · Production</text>
+
+  <line x1="805" y1="245" x2="805" y2="265" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="750" y="270" width="110" height="45" rx="8" fill="#047857" opacity="0.8"/>
+  <text x="805" y="290" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">监控 &amp; 回滚</text>
+  <text x="805" y="305" text-anchor="middle" fill="#a7f3d0" font-size="9">告警 · 灰度 · 回滚</text>
+
+  <!-- Feedback loop from Phase 3 back to Phase 1 -->
+  <path d="M 860,200 Q 890,200 890,460 Q 890,475 450,475 Q 20,475 20,440" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow-gray)"/>
+  <text x="450" y="470" text-anchor="middle" fill="#94a3b8" font-size="10" font-style="italic">线上反馈 → 新需求 / Bug → 进入下一轮迭代</text>
+</svg>
