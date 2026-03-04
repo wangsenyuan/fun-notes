@@ -34,7 +34,7 @@ Phase 1 内部是一个 **循环迭代** 的闭环（Spec 起草 → Vibr Coding
 
 Foundation 层为 Phase 1 和 Phase 2 提供底层能力支撑。
 
-![AI-Assisted Spec-Driven Vibr Coding Flow](../assets/ai-spec-vibr-flow.svg)
+![AI-Assisted Spec-Driven Vibr Coding Flow]({{ site.baseurl }}/assets/ai-spec-vibr-flow.svg)
 
 ---
 
