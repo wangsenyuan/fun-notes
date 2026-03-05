@@ -1,6 +1,6 @@
 ---
-title: AI-Assisted Spec-Driven Vibr Coding Flow
-tags: ai, ide, spec, openspec, speckit, vibr-coding, process, enterprise
+title: AI-Assisted Spec-Driven Vibe Coding Flow
+tags: ai, ide, spec, openspec, speckit, vibe-coding, process, enterprise
 date: 2026-03-04
 ---
 
@@ -30,11 +30,11 @@ date: 2026-03-04
 | Phase 3 | 发布上线 | 构建打包 → 部署 → 监控 & 回滚 |
 | Foundation | AI 基础能力层 | Agent Skills（规范/知识/模板）+ MCP Server（外部系统集成） |
 
-Phase 1 内部是一个 **循环迭代** 的闭环（Spec 起草 → Vibr Coding → 测试验证 → 回到 Spec），开发者可以在 AI 辅助下多轮打磨，直到认为可以提交 PR。Phase 2 是自动化的质量关卡，未通过则打回 Phase 1 修改。Phase 3 在所有门槛通过后执行发布，线上反馈再回到 Phase 1 形成大循环。
+Phase 1 内部是一个 **循环迭代** 的闭环（Spec 起草 → vibe Coding → 测试验证 → 回到 Spec），开发者可以在 AI 辅助下多轮打磨，直到认为可以提交 PR。Phase 2 是自动化的质量关卡，未通过则打回 Phase 1 修改。Phase 3 在所有门槛通过后执行发布，线上反馈再回到 Phase 1 形成大循环。
 
 Foundation 层为 Phase 1 和 Phase 2 提供底层能力支撑。
 
-![AI-Assisted Spec-Driven Vibr Coding Flow]({{ site.baseurl }}/assets/ai-spec-vibr-flow.svg)
+![AI-Assisted Spec-Driven vibe Coding Flow]({{ site.baseurl }}/assets/ai-spec-vibe-flow.svg)
 
 ---
 
@@ -84,7 +84,7 @@ Phase 1 是开发者日常工作的主战场。以下三个步骤构成一个 **
   - 开发者本人对 Spec 正确性负责。日常小变更可自审通过，复杂/跨团队变更走多人评审。
 - **责任人**：**人类开发者 / 领域责任人** 对"需求版真相"负责，AI 的输出只是材料。
 
-### 1. Vibr Coding 实现
+### 1. vibe Coding 实现
 
 **目标**：在 IDE 中用 AI 高效生成和改写代码，但所有关键决策和签字由人负责。
 
@@ -185,6 +185,6 @@ PR 提交后，流水线自动串联以下检查：
 ## 后续讨论方向
 
 - **方向 1**：细化 Spec 起草的操作细则和示例（包括一个完整的 Spec 样例）。
-- **方向 2**：定义 Vibr Coding 的"函数式风格"在本团队内的最小约束集。
+- **方向 2**：定义 vibe Coding 的"函数式风格"在本团队内的最小约束集。
 - **方向 3**：把 Agent Skills 和 MCP Server 的具体配置方案落地（包括 Skill 清单、MCP 接口定义）。
 - **方向 4**：把 AI 使用模式写成可引用的 Prompt/Skill/Plugin 配置，减少口头约定。
