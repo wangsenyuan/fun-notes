@@ -174,7 +174,7 @@ rules:
 
 常规流程是团队默认路径，也是重点要求执行的部分。
 
-![OpenSpec 团队常规流程图](../assets/openspec-team-workflow.svg)
+![OpenSpec 团队常规流程图]({{ site.baseurl }}/assets/openspec-team-workflow.svg)
 
 项目首次接入 OpenSpec 时，先执行一次初始化：
 
