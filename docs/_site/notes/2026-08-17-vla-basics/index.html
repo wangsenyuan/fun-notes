@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vision-Language-Action (VLA) Basics for Robot Projects — Fun Notes</title>
+  <link rel="stylesheet" href="/fun-notes/css/style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/fun-notes/">Fun Notes</a>
+    </nav>
+  </header>
+  <main>
+    <article class="note">
+  <header>
+    <h1>Vision-Language-Action (VLA) Basics for Robot Projects</h1>
+    
+    <div class="meta">
+      <span>August 17, 2026</span>
+      
+      <span class="tags">robotics,, VLA,, AI,, vision,, language,, control</span>
+      
+    </div>
+    
+  </header>
+  <div class="content">
+    <p>A <strong>Vision-Language-Action (VLA)</strong> model is a single neural net that takes camera images and a natural-language instruction (plus robot state), and outputs motor commands. The same weights can follow “pick up the red cup” and “put the banana in the bowl” without swapping controllers.</p>
+
+<p>If you already know VLMs (GPT-4o, PaliGemma, LLaVA): a VLA is a VLM that learned to <strong>speak robot actions</strong> instead of only speaking text.</p>
+
+<p><strong>Want official beginner docs next?</strong> See the <a href="/fun-notes/notes/2026-08-17-vla-beginner-docs/">VLA beginner reading list</a> (LeRobot course, ACT, then SmolVLA).</p>
+
+<p><img src="/fun-notes/assets/vla-pipeline.svg" alt="VLA pipeline" /></p>
+
+<hr />
+
+<h2 id="1-the-problem-vlas-are-solving">1. The problem VLAs are solving</h2>
+
+<p>A classic manipulation stack is a pipeline of specialists:</p>
+
+<ol>
+  <li><strong>See</strong> — detect objects, estimate pose</li>
+  <li><strong>Plan</strong> — pick a grasp, a path, a sequence of skills</li>
+  <li><strong>Act</strong> — inverse kinematics + low-level tracking</li>
+</ol>
+
+<p>Each box is brittle. A new object, a new verb, or a slightly different table often means new code or a new policy.</p>
+
+<p>VLAs collapse the middle of that stack into one <strong>language-conditioned policy</strong>:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(images, instruction, proprioception)  →  action chunk
+</code></pre></div></div>
+
+<p>Language is the task API. You do not compile “put the cup in the sink” into a finite-state machine; you condition the policy on that sentence.</p>
+
+<p>They are <strong>not</strong> magic. They still need demonstrations, a well-defined action space, and a control loop that is fast enough for the robot. What they buy you is <strong>generalization through language and internet-scale vision</strong>, plus a path to reuse one backbone across many tasks.</p>
+
+<hr />
+
+<h2 id="2-the-closed-loop-picture">2. The closed-loop picture</h2>
+
+<p>At inference the robot does not “think once and execute a movie.” It runs a loop, typically 5–50 Hz:</p>
+
+<ol>
+  <li>Read cameras + joint/gripper state</li>
+  <li>Run the VLA → a short <strong>action chunk</strong> (e.g. the next 8–50 timesteps)</li>
+  <li>Send those actions to the robot</li>
+  <li>Observe again (closed loop)</li>
+</ol>
+
+<p><strong>Action chunking</strong> is the important implementation trick. Predicting a horizon of future actions at once:</p>
+
+<ul>
+  <li>hides LLM latency behind several control ticks</li>
+  <li>makes motion smoother than one-step greedy actions</li>
+  <li>reduces compounding error versus open-loop “plan the whole episode”</li>
+</ul>
+
+<p>You still replan every chunk. Think of it as receding-horizon control with a neural net as the planner.</p>
+
+<p>A functional sketch of the loop:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">predict_chunk</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">images</span><span class="p">,</span> <span class="n">instruction</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nf">model</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">instruction</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">run_episode</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">instruction</span><span class="p">,</span> <span class="n">sense</span><span class="p">,</span> <span class="n">send</span><span class="p">,</span> <span class="n">done</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+        <span class="n">images</span><span class="p">,</span> <span class="n">proprio</span> <span class="o">=</span> <span class="nf">sense</span><span class="p">()</span>
+        <span class="n">chunk</span> <span class="o">=</span> <span class="nf">predict_chunk</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">images</span><span class="p">,</span> <span class="n">instruction</span><span class="p">,</span> <span class="n">proprio</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nf">send</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">loop</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">state</span> <span class="k">if</span> <span class="nf">done</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="k">else</span> <span class="nf">loop</span><span class="p">(</span><span class="nf">step</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="nf">loop</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The real system adds safety limits, action un-normalization, and a fallback if inference is late.</p>
+
+<hr />
+
+<h2 id="3-anatomy-of-a-vla">3. Anatomy of a VLA</h2>
+
+<p>Almost every current VLA is three pieces glued together.</p>
+
+<h3 id="vision-encoder">Vision encoder</h3>
+
+<p>Turns pixels into tokens. Common choices: <strong>SigLIP</strong> (semantic / language-aligned) and <strong>DINOv2</strong> (spatial / geometry). OpenVLA fuses both: semantics for “which object is the cup,” spatial features for “where is it in the gripper frame.”</p>
+
+<p>Typical inputs: one scene camera, often a wrist camera. More views help grasping; they also cost compute.</p>
+
+<h3 id="language-backbone-vlm">Language backbone (VLM)</h3>
+
+<p>A pretrained transformer that already maps images + text into a shared space. This is where internet knowledge lives: “a sponge is for wiping,” “red is a color,” “a sink is a container.” RT-2’s headline result was that this knowledge <strong>transfers</strong> into robot behavior when you co-train on actions.</p>
+
+<h3 id="action-head">Action head</h3>
+
+<p>The part that is actually robotics. Two main families:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Family</th>
+      <th>How actions are produced</th>
+      <th>Strength</th>
+      <th>Cost</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Discrete tokens</strong> (RT-2, original OpenVLA)</td>
+      <td>Bin each action dim (often 256 bins) and emit tokens like language</td>
+      <td>Reuses the LLM decoder as-is; simple training</td>
+      <td>Quantization error; slow if you decode token-by-token</td>
+    </tr>
+    <tr>
+      <td><strong>Continuous / flow matching</strong> (π0)</td>
+      <td>An action expert denoises a continuous vector (diffusion / flow)</td>
+      <td>Smooth, high-rate, better for dexterity</td>
+      <td>Extra module; different training recipe</td>
+    </tr>
+    <tr>
+      <td><strong>Dual-system</strong> (GR00T N1, Helix-style)</td>
+      <td>Slow VLM for semantics + fast expert for motor commands</td>
+      <td>Splits “what” from “how”</td>
+      <td>More moving parts</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>A typical action vector (per timestep) looks like:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[Δx, Δy, Δz, Δroll, Δpitch, Δyaw, gripper]
+</code></pre></div></div>
+
+<p>in end-effector space, or joint-space deltas for some arms. Values are <strong>normalized</strong> to the dataset (often into <code class="language-plaintext highlighter-rouge">[-1, 1]</code>) before training; you must invert that transform on the robot.</p>
+
+<hr />
+
+<h2 id="4-landmark-models-enough-history-to-read-papers">4. Landmark models (enough history to read papers)</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>What to remember</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>RT-1</strong> (Google, 2022)</td>
+      <td>Transformer policy on many robot demos. Language-conditioned, but not yet a web VLM.</td>
+    </tr>
+    <tr>
+      <td><strong>RT-2</strong> (2023)</td>
+      <td>Coined <strong>VLA</strong>. Fine-tune a web VLM so action tokens live in the same vocabulary as words. Emergent semantic generalization (“move the coke can onto the picture of an extinct animal”).</td>
+    </tr>
+    <tr>
+      <td><strong>Open X-Embodiment / RT-X</strong></td>
+      <td>Many labs, many robots, one dataset. The pretraining corpus behind most open VLAs.</td>
+    </tr>
+    <tr>
+      <td><strong>OpenVLA</strong> (2024, 7B)</td>
+      <td>First widely used open VLA. Llama 2 + SigLIP/DINOv2, ~970k OXE episodes. Fine-tune with LoRA on a single GPU.</td>
+    </tr>
+    <tr>
+      <td><strong>Octo</strong></td>
+      <td>Smaller generalist diffusion policy; good baseline, less “LLM reasoning.”</td>
+    </tr>
+    <tr>
+      <td><strong>π0 / π0.5</strong> (Physical Intelligence)</td>
+      <td>PaliGemma-scale VLM + <strong>flow-matching action expert</strong>. Smooth ~50 Hz chunks; current mental model for “modern VLA.”</td>
+    </tr>
+    <tr>
+      <td><strong>SmolVLA / LeRobot policies</strong></td>
+      <td>Hugging Face stack aimed at actually running on a desk robot (SO-100, ALOHA, etc.). Start here if you have hardware.</td>
+    </tr>
+    <tr>
+      <td><strong>GR00T N1</strong> (NVIDIA)</td>
+      <td>Cross-embodiment / humanoid-oriented dual-system VLA.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>You do not need to reimplement these. You need to know <strong>which action head you are inheriting</strong>, because that choice dominates latency, precision, and how you collect data.</p>
+
+<hr />
+
+<h2 id="5-how-they-are-trained">5. How they are trained</h2>
+
+<p>Two-phase recipe, almost always:</p>
+
+<ol>
+  <li><strong>Pretrain</strong> a VLM on web image–text (already done for you).</li>
+  <li><strong>Robot-train</strong> on demonstration trajectories: at each timestep, given <code class="language-plaintext highlighter-rouge">(images, instruction, state)</code>, predict the human/teleop action.</li>
+</ol>
+
+<p>That is <strong>behavior cloning</strong> (imitation learning) at heart. Scale and diversity do the heavy lifting:</p>
+
+<ul>
+  <li>many tasks, many objects, many cameras, several embodiments</li>
+  <li>language that actually varies (not one canned sentence per skill)</li>
+  <li>failures and recoveries, not only clean successes</li>
+</ul>
+
+<p>Fine-tuning for <em>your</em> robot is usually <strong>LoRA</strong> (or similar PEFT) on a few hundred to a few thousand episodes, not training 7B weights from scratch.</p>
+
+<p>What VLAs generally are <strong>not</strong> (yet) in a beginner project:</p>
+
+<ul>
+  <li>full online RL from scratch on the real robot</li>
+  <li>a replacement for a safety-rated motion stack</li>
+  <li>a mapping from a single photo to a whole long-horizon program without a loop</li>
+</ul>
+
+<p>Some systems add a high-level planner (another LLM) that emits subgoals, then a VLA executes each subgoal. That is a <strong>hierarchy</strong>, not a different definition of VLA.</p>
+
+<hr />
+
+<h2 id="6-what-good-data-means">6. What “good data” means</h2>
+
+<p>The model can only follow language that is <strong>grounded in the demos</strong>.</p>
+
+<p>Useful collection habits:</p>
+
+<ul>
+  <li><strong>One instruction per episode</strong>, but many phrasings across the dataset (“place the mug in the dish rack” / “put the cup away”).</li>
+  <li><strong>Wrist + scene cameras</strong>, synced with actions.</li>
+  <li><strong>Fixed control rate</strong> (e.g. 20 Hz). Do not mix 5 Hz and 50 Hz in one action space without resampling.</li>
+  <li><strong>Relative actions</strong> in a consistent frame (often end-effector in the robot or camera frame).</li>
+  <li><strong>Coverage</strong>: start poses, object positions, lighting, clutter. VLAs interpolate; they do not invent kinematics you never showed.</li>
+</ul>
+
+<p>Open datasets to know: <strong>Open X-Embodiment</strong>, <strong>DROID</strong>, <strong>ALOHA / Mobile ALOHA</strong>. For a personal project, your own teleop on one platform will beat a giant mismatched corpus.</p>
+
+<hr />
+
+<h2 id="7-a-practical-path-on-a-real-robot">7. A practical path on a real robot</h2>
+
+<p>A sane beginner sequence:</p>
+
+<ol>
+  <li><strong>Pick a supported stack</strong> — Hugging Face <strong>LeRobot</strong> plus a cheap arm (SO-100 / SO-101, ALOHA-like) is the shortest path to a working VLA loop. Avoid building camera sync, dataset format, and training glue yourself.</li>
+  <li><strong>Define a tiny skill</strong> — e.g. pick a single cube and drop it in a bowl. One verb, one object class, one workspace.</li>
+  <li><strong>Teleoperate 50–100 clean episodes</strong> before you touch a 7B model. If a simple ACT / diffusion policy cannot clone this, a VLA will not save you.</li>
+  <li><strong>Fine-tune a small VLA</strong> (SmolVLA, π0-style, or OpenVLA-OFT) with LoRA. Freeze most of the LLM; train the action path.</li>
+  <li><strong>Evaluate closed-loop</strong>, not MSE on actions. Success rate from varied starts is the only metric that matters.</li>
+  <li><strong>Then</strong> scale language diversity, objects, and model size.</li>
+</ol>
+
+<p>Hardware reality check:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Piece</th>
+      <th>Why it matters</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Camera latency + sync</td>
+      <td>The model sees the past; unsynced wrist cameras look like a different robot</td>
+    </tr>
+    <tr>
+      <td>Inference device</td>
+      <td>7B unquantized is a 4090/A100 class problem; 4-bit + small VLAs fit hobby GPUs</td>
+    </tr>
+    <tr>
+      <td>Control rate</td>
+      <td>Discrete token VLAs often sit at ~3–5 Hz unless you use parallel decoding / chunking</td>
+    </tr>
+    <tr>
+      <td>Action limits</td>
+      <td>Always clamp in Cartesian/joint space; the net will occasionally output nonsense</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="8-common-failure-modes">8. Common failure modes</h2>
+
+<ul>
+  <li><strong>Language that was never in training</strong> — “gently” or “the one on the left” only works if demos teach those words.</li>
+  <li><strong>Distribution shift</strong> — new table texture, a novel mug shape, a camera that moved 3 cm.</li>
+  <li><strong>Quantized actions on precise tasks</strong> — inserting a peg, zipping, folding: prefer continuous action heads.</li>
+  <li><strong>Open-loop chunks that are too long</strong> — the world moved; the chunk did not.</li>
+  <li><strong>Evaluating with teacher-forced MSE</strong> — low action error can still mean 0% task success.</li>
+  <li><strong>Ignoring the low-level controller</strong> — VLA outputs setpoints; something still has to track them safely.</li>
+</ul>
+
+<hr />
+
+<h2 id="9-mental-model-to-keep">9. Mental model to keep</h2>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>VLM  =  see + read  →  text
+VLA  =  see + read  →  motor commands   (often still internally “tokens”)
+</code></pre></div></div>
+
+<p>Three questions when you read a VLA paper or pick a checkpoint:</p>
+
+<ol>
+  <li><strong>Action representation</strong> — discrete bins, continuous regression, or flow/diffusion?</li>
+  <li><strong>Chunk horizon and control frequency</strong> — can it keep up with <em>your</em> arm?</li>
+  <li><strong>What was it trained on</strong> — embodiment, cameras, action frame, language style?</li>
+</ol>
+
+<p>If those three match your robot, fine-tuning is plausible. If they do not, you are doing a transfer problem, not a drop-in deploy.</p>
+
+<hr />
+
+<h2 id="10-where-to-go-next">10. Where to go next</h2>
+
+<ul>
+  <li><strong>Beginner docs</strong> — <a href="/fun-notes/notes/2026-08-17-vla-beginner-docs/">curated reading list</a>: Hugging Face Robotics Course, LeRobot install/cheat sheet, ACT, then SmolVLA</li>
+  <li>RT-2 paper — why action tokens + web VLMs generalize</li>
+  <li>OpenVLA — open 7B recipe, LoRA fine-tuning, OXE</li>
+  <li>π0 — flow-matching action expert, high-rate chunks</li>
+  <li>Open X-Embodiment — what “cross-robot pretraining data” looks like</li>
+</ul>
+
+<p>For this notes repo, the takeaway is small: <strong>a VLA is a language-conditioned visuomotor policy built on a pretrained VLM.</strong> Everything else — tokens vs flow, chunking, LoRA, OXE — is how that idea is made fast and trainable on a real arm.</p>
+
+  </div>
+</article>
+
+  </main>
+  <footer>
+    <a href="/fun-notes/">← Back to notes</a>
+  </footer>
+</body>
+</html>

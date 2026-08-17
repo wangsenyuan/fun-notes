@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vibe Coding + Spec-Driven Development (SDD) — Fun Notes</title>
+  <link rel="stylesheet" href="/fun-notes/css/style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/fun-notes/">Fun Notes</a>
+    </nav>
+  </header>
+  <main>
+    <article class="note">
+  <header>
+    <h1>Vibe Coding + Spec-Driven Development (SDD)</h1>
+    
+    <div class="meta">
+      <span>March 02, 2026</span>
+      
+      <span class="tags">AI,, LLM,, coding,, productivity,, methodology</span>
+      
+    </div>
+    
+  </header>
+  <div class="content">
+    <h2 id="the-problem-with-vibe-coding-alone">The Problem with Vibe Coding Alone</h2>
+
+<p>Vibe coding — directing an AI with loose, intent-driven prompts and iterating until it “feels right” — is fast but <strong>lossy</strong>. Every session, intent evaporates. The AI does something reasonable, you accept it, and three weeks later nobody knows <em>why</em> the code is shaped the way it is.</p>
+
+<p>Spec-Driven Development (SDD) is fundamentally a solution to that lossiness. <strong>The spec is what survives between sessions.</strong></p>
+
+<hr />
+
+<h2 id="sdd-is-not-the-opposite-of-vibe-coding">SDD Is Not the Opposite of Vibe Coding</h2>
+
+<p>The right framing is not “vibe coding vs. SDD” — it is <strong>SDD integrated into vibe coding</strong>.</p>
+
+<p>In the traditional SDLC, there are already specs at every phase:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Requirements → [Spec] → Arch Design → [Spec] → Coding → [Spec] → Testing → Release
+</code></pre></div></div>
+
+<p>The spec is not a phase — it is the <strong>living artifact that flows through all phases</strong>, getting more precise at each step. At each stage, the AI can consume the spec to do the vibe-coding execution.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>SDLC Phase</th>
+      <th>Spec Role</th>
+      <th>AI / Vibe Coding Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Requirements</td>
+      <td>Natural language, user stories</td>
+      <td>AI helps formalize, find gaps</td>
+    </tr>
+    <tr>
+      <td>Arch Design</td>
+      <td>Interface contracts, data models</td>
+      <td>AI proposes implementations</td>
+    </tr>
+    <tr>
+      <td>Coding</td>
+      <td>Spec as prompt context + guardrail</td>
+      <td>AI executes; spec catches drift</td>
+    </tr>
+    <tr>
+      <td>Testing</td>
+      <td>Spec → acceptance criteria</td>
+      <td>AI generates test cases from spec</td>
+    </tr>
+    <tr>
+      <td>Release/Docs</td>
+      <td>Spec IS the documentation</td>
+      <td>AI generates changelogs, API docs</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p><strong>Vibe coding without a spec is chaotic. Vibe coding <em>against</em> a spec is engineering.</strong></p>
+</blockquote>
+
+<hr />
+
+<h2 id="who-writes-the-spec">Who Writes the Spec?</h2>
+
+<p>The most powerful workflow:</p>
+
+<ol>
+  <li><strong>Human writes intent</strong> — the core requirement, in rough natural language</li>
+  <li><strong>AI drafts the spec</strong> — formalizes it into structured scenarios and constraints</li>
+  <li><strong>Human reviews and corrects</strong> — much faster than writing from scratch</li>
+</ol>
+
+<p>The AI is good at formalizing vague intent into structured scenarios. Reviewing a draft spec is faster than writing one. This keeps the “vibe” feeling while still producing a durable artifact.</p>
+
+<p>The sweet spot for spec granularity: <strong>behavioral specs with scenarios</strong> — describe what the system does under specific conditions, not how it does it. Enough to constrain the AI without over-specifying implementation.</p>
+
+<hr />
+
+<h2 id="the-hard-problems">The Hard Problems</h2>
+
+<h3 id="1-users-dont-review-the-spec">1. Users Don’t Review the Spec</h3>
+
+<p>This is the honest reality. Most developers will rubber-stamp a plausible-looking spec — the same way they rubber-stamp PRs. The value isn’t always in the upfront review. It is in having an artifact to <strong>interrogate after something breaks</strong>. The spec is what you compare against when production behavior diverges from intent.</p>
+
+<h3 id="2-spec-history-and-evaluation">2. Spec History and Evaluation</h3>
+
+<ul>
+  <li><strong>History</strong>: git is natural. The spec evolves in commits alongside code. Tools like <a href="https://github.com/Fission-AI/OpenSpec">OpenSpec</a> use a delta model — each change has its own spec artifacts that archive into the main spec. Specs evolve <em>with</em> the system rather than decaying beside it.</li>
+  <li><strong>Is this spec good?</strong> A spec is good if it is <em>predictive</em> — does following it produce the intended behavior? One proxy: <strong>scenario coverage</strong> — does the spec have concrete examples for the important cases, or is it all vague prose?</li>
+  <li><strong>How good/bad?</strong> This needs a feedback loop. After each change ships, compare actual behavior against spec scenarios. The gap is the quality signal. Over time you learn which spec styles produce reliable implementations and which don’t.</li>
+</ul>
+
+<h3 id="3-large-and-complex-projects">3. Large and Complex Projects</h3>
+
+<p>The spec has to be <strong>hierarchical</strong>. One flat spec cannot describe a large system. The natural decomposition follows the architecture:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>system spec       (invariants, principles)
+  └── domain spec (bounded contexts)
+        └── feature spec (behaviors, scenarios)
+              └── change delta (this PR / session)
+</code></pre></div></div>
+
+<p>The AI loads only the relevant slice. This mirrors how senior engineers think about large systems. The challenge is maintaining consistency <em>across</em> levels.</p>
+
+<h3 id="4-legacy-projects">4. Legacy Projects</h3>
+
+<p>You cannot write specs for what you do not understand, and legacy code is often not understood by anyone.</p>
+
+<p><strong>Reverse-spec first:</strong></p>
+<blockquote>
+  <p>Ask the AI to read the code and <em>generate</em> a spec describing what it currently does. You review and correct it. Now you have a baseline. Every future change goes through the delta model.</p>
+</blockquote>
+
+<p>The reverse-spec will not be complete or correct — but it does not need to be. It just needs to be <em>good enough to catch drift</em>. Over time, as changes accumulate, the spec becomes more authoritative than the code itself.</p>
+
+<hr />
+
+<h2 id="the-real-opportunity">The Real Opportunity</h2>
+
+<p>The spec is only valuable if it is kept honest. That requires either discipline (hard) or tooling that makes dishonesty expensive (better).</p>
+
+<p>The real product opportunity is not the spec format itself — it is the <strong>enforcement layer</strong>: tooling that automatically compares implementation against spec, flags drift, and closes the feedback loop without requiring the developer to remember to do it.</p>
+
+<hr />
+
+<h2 id="key-insight">Key Insight</h2>
+
+<blockquote>
+  <p>Vibe coding outsources <em>execution</em> to the AI. SDD ensures the AI is executing against <em>human intent</em>, not its own assumptions. The spec is how human judgment survives across sessions, team members, and time.</p>
+</blockquote>
+
+
+  </div>
+</article>
+
+  </main>
+  <footer>
+    <a href="/fun-notes/">← Back to notes</a>
+  </footer>
+</body>
+</html>

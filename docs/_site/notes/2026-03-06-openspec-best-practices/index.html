@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>团队 OpenSpec 使用规范 — Fun Notes</title>
+  <link rel="stylesheet" href="/fun-notes/css/style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/fun-notes/">Fun Notes</a>
+    </nav>
+  </header>
+  <main>
+    <article class="note">
+  <header>
+    <h1>团队 OpenSpec 使用规范</h1>
+    
+    <div class="meta">
+      <span>March 06, 2026</span>
+      
+      <span class="tags">openspec,, spec,, process,, workflow,, best-practice,, ai</span>
+      
+    </div>
+    
+  </header>
+  <div class="content">
+    <p>本文用于约束开发团队如何使用 OpenSpec 管理需求、实现和归档。它不是工具操作手册，而是一套团队协作规范：什么情况下必须建 spec，spec 写到什么程度，开发过程中如何保持 spec 与代码一致，以及遇到异常情况时如何处理。</p>
+
+<hr />
+
+<h2 id="1-openspec-简介">1. OpenSpec 简介</h2>
+
+<h3 id="11-openspec-是什么">1.1 OpenSpec 是什么</h3>
+
+<p>OpenSpec 可以理解为一种“以变更为中心”的研发协作方式：</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">specs/</code> 描述系统当前已经成立的行为，是当前事实。</li>
+  <li><code class="language-plaintext highlighter-rouge">changes/</code> 描述正在发生的变更，是未来事实。</li>
+  <li>开发不是直接改代码，而是先定义“行为要变成什么”，再实现，再归档为新的事实。</li>
+</ul>
+
+<p>对团队来说，OpenSpec 的价值不在于多了一套目录，而在于把下面三件事绑定在一起：</p>
+
+<ul>
+  <li>需求边界</li>
+  <li>代码实现</li>
+  <li>变更历史</li>
+</ul>
+
+<h3 id="12-核心概念">1.2 核心概念</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>概念</th>
+      <th>团队视角下的含义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Spec</strong></td>
+      <td>系统行为说明，回答“系统应该做什么”。它不讨论类、函数、框架等实现细节。</td>
+    </tr>
+    <tr>
+      <td><strong>Change</strong></td>
+      <td>一次独立变更单元，通常对应一个需求、一个缺陷修复或一个明确的重构目标。</td>
+    </tr>
+    <tr>
+      <td><strong>Delta Spec</strong></td>
+      <td>对现有系统行为的增量描述，只写本次 change 改变了什么。</td>
+    </tr>
+    <tr>
+      <td><strong>Proposal</strong></td>
+      <td>说明为什么要做、要做到什么程度、不做什么。</td>
+    </tr>
+    <tr>
+      <td><strong>Design</strong></td>
+      <td>说明怎么实现，以及为什么这样实现。</td>
+    </tr>
+    <tr>
+      <td><strong>Tasks</strong></td>
+      <td>可执行的落地清单，回答“接下来具体做什么”。</td>
+    </tr>
+    <tr>
+      <td><strong>Archive</strong></td>
+      <td>变更完成后归档，保留审计和回溯能力。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="13-推荐目录结构">1.3 推荐目录结构</h3>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>openspec/
+├── config.yaml           # OpenSpec 项目级配置
+├── specs/                # 当前生效的系统行为
+└── changes/              # 正在进行中的变更
+    ├── &lt;change-name&gt;/
+    │   ├── proposal.md
+    │   ├── design.md
+    │   ├── tasks.md
+    │   └── specs/
+    └── archive/          # 已归档的历史变更
+</code></pre></div></div>
+
+<h3 id="14-团队对-openspec-的基本约束">1.4 团队对 OpenSpec 的基本约束</h3>
+
+<ul>
+  <li>任何会改变外部可观察行为的工作，都应先进入 OpenSpec。</li>
+  <li>spec 是团队共享语言，不是写给某一个 AI 或某一个开发者看的临时说明。</li>
+  <li><code class="language-plaintext highlighter-rouge">specs/</code> 只记录“当前成立的行为”，不保留讨论痕迹；讨论和权衡放在 <code class="language-plaintext highlighter-rouge">changes/</code> 中。</li>
+  <li>如果代码与 spec 不一致，以 spec 为准；如果 spec 错了，应先修 spec，再继续实现。</li>
+</ul>
+
+<h3 id="15-初始化要求先-openspec-init">1.5 初始化要求：先 <code class="language-plaintext highlighter-rouge">openspec init</code></h3>
+
+<p>根据 OpenSpec 官方 <code class="language-plaintext highlighter-rouge">customization.md</code>，<code class="language-plaintext highlighter-rouge">openspec init</code> 的重点是交互式创建项目级配置文件 <code class="language-plaintext highlighter-rouge">openspec/config.yaml</code>，用于定制 OpenSpec 的默认行为。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>openspec init
+</code></pre></div></div>
+
+<p>因此，团队对 <code class="language-plaintext highlighter-rouge">init</code> 的理解应是：</p>
+
+<ul>
+  <li>它是“项目接入 OpenSpec”的初始化步骤</li>
+  <li>它的核心产物是 <code class="language-plaintext highlighter-rouge">openspec/config.yaml</code></li>
+  <li>它用于固化项目级的默认 schema、context 和 rules</li>
+  <li>它不是每次 change 都要重新执行的日常步骤</li>
+</ul>
+
+<p>如果仓库还没有完成 <code class="language-plaintext highlighter-rouge">init</code>，建议不要直接开始 <code class="language-plaintext highlighter-rouge">propose</code>，因为 AI 会缺少项目级约束。</p>
+
+<h3 id="16-openspecconfigyaml-配置规范">1.6 <code class="language-plaintext highlighter-rouge">openspec/config.yaml</code> 配置规范</h3>
+
+<p>按官方文档，<code class="language-plaintext highlighter-rouge">openspec/config.yaml</code> 主要负责三件事：</p>
+
+<ul>
+  <li>指定默认 <code class="language-plaintext highlighter-rouge">schema</code></li>
+  <li>提供项目级 <code class="language-plaintext highlighter-rouge">context</code></li>
+  <li>为不同 artifact 定义 <code class="language-plaintext highlighter-rouge">rules</code></li>
+</ul>
+
+<p>团队规范应围绕这三块来设计，而不是随意扩展一套自定义字段。</p>
+
+<p>一个最小可用示意如下：</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">schema</span><span class="pi">:</span> <span class="s">spec-driven</span>
+
+<span class="na">context</span><span class="pi">:</span> <span class="pi">|</span>
+  <span class="s">Tech stack: TypeScript, Next.js, Node.js</span>
+  <span class="s">Package manager: pnpm</span>
+  <span class="s">Testing: Vitest and Playwright</span>
+  <span class="s">Follow company engineering rules in docs/team-engineering-rules.md</span>
+  <span class="s">Before drafting frontend-related changes, read .codex/skills/frontend/SKILL.md</span>
+  <span class="s">Before drafting test strategy, read .codex/skills/testing/SKILL.md</span>
+
+<span class="na">rules</span><span class="pi">:</span>
+  <span class="na">proposal</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">Include rollback plan</span>
+    <span class="pi">-</span> <span class="s">Identify affected teams</span>
+  <span class="na">specs</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">Use Given/When/Then format</span>
+    <span class="pi">-</span> <span class="s">Cover permission and failure scenarios</span>
+  <span class="na">design</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">Reference existing patterns before inventing new ones</span>
+  <span class="na">tasks</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">Add explicit test tasks for behavior changes</span>
+</code></pre></div></div>
+
+<h3 id="161-schema-规范">1.6.1 <code class="language-plaintext highlighter-rouge">schema</code> 规范</h3>
+
+<ul>
+  <li>默认应使用团队认可的 schema，避免每次命令都手动指定</li>
+  <li>如果团队采用官方标准流程，优先使用默认的 <code class="language-plaintext highlighter-rouge">spec-driven</code></li>
+  <li>只有当团队流程明显不同于标准 artifacts 结构时，才考虑自定义 schema</li>
+</ul>
+
+<h3 id="162-context-规范">1.6.2 <code class="language-plaintext highlighter-rouge">context</code> 规范</h3>
+
+<p><code class="language-plaintext highlighter-rouge">context</code> 会注入所有 artifact 生成过程，因此这里只放“所有 change 默认都应知道的信息”。推荐包括：</p>
+
+<ul>
+  <li>技术栈与核心框架</li>
+  <li>包管理、构建和测试工具</li>
+  <li>API 契约位置或接口风格</li>
+  <li>公司代码规范入口</li>
+  <li>兼容性、安全性、性能等长期约束</li>
+  <li>AI 在特定场景下应优先读取的 skills 或内部文档</li>
+</ul>
+
+<p>如果团队希望 AI 自动参考 skills，更稳妥的做法是在 <code class="language-plaintext highlighter-rouge">context</code> 中明确写出“什么场景下应读取哪个 skill”，而不是再发明一套平行配置。</p>
+
+<h3 id="163-rules-规范">1.6.3 <code class="language-plaintext highlighter-rouge">rules</code> 规范</h3>
+
+<p><code class="language-plaintext highlighter-rouge">rules</code> 应写成可执行的 artifact 约束。推荐至少覆盖：</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">proposal</code>：范围、风险、影响面、回滚方案</li>
+  <li><code class="language-plaintext highlighter-rouge">specs</code>：Given/When/Then、主路径、失败路径、权限边界</li>
+  <li><code class="language-plaintext highlighter-rouge">design</code>：关键权衡、兼容性影响、迁移方案</li>
+  <li><code class="language-plaintext highlighter-rouge">tasks</code>：实现步骤、验证步骤、测试任务</li>
+</ul>
+
+<p>规则应尽量具体，例如：</p>
+
+<ul>
+  <li>Include rollback plan</li>
+  <li>Cover permission and failure scenarios</li>
+  <li>Add explicit test tasks for behavior changes</li>
+</ul>
+
+<p>不要只写：</p>
+
+<ul>
+  <li>Follow best practices</li>
+  <li>Keep high quality</li>
+</ul>
+
+<p>这类表述无法稳定约束输出。</p>
+
+<h3 id="17-什么时候需要自定义-schema">1.7 什么时候需要自定义 schema</h3>
+
+<p>官方支持自定义 schema，但团队不应一开始就走这条路。更合理的顺序是：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>先运行 openspec init
+→ 在 config.yaml 中固化 schema / context / rules
+→ 只有当标准 spec-driven 流程不适用时，再自定义 schema
+</code></pre></div></div>
+
+<p>通常只有在下面几类情况才需要自定义 schema：</p>
+
+<ul>
+  <li>团队希望替换标准 artifacts 结构</li>
+  <li>团队需要新增或删除某类 artifact</li>
+  <li>团队需要定制模板或 artifact 之间的依赖关系</li>
+</ul>
+
+<hr />
+
+<h2 id="2-常规使用流程">2. 常规使用流程</h2>
+
+<p>常规流程是团队默认路径，也是重点要求执行的部分。</p>
+
+<p><img src="/fun-notes/assets/openspec-team-workflow.svg" alt="OpenSpec 团队常规流程图" /></p>
+
+<p>项目首次接入 OpenSpec 时，先执行一次初始化：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0. openspec init
+</code></pre></div></div>
+
+<p>初始化完成后，日常 change 建议统一按下面 6 步执行：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. /opsx:propose "简单需求"
+2. AI 总结需求并生成 change
+3. 开发 review 产出物并迭代到可开发
+4. /opsx:apply 生成代码
+5. review 并测试代码
+6. /opsx:archive
+</code></pre></div></div>
+
+<h3 id="21-什么时候必须走-openspec">2.1 什么时候必须走 OpenSpec</h3>
+
+<p>以下情况必须创建 change：</p>
+
+<ul>
+  <li>新增功能</li>
+  <li>修改现有业务规则</li>
+  <li>修复会改变系统行为的缺陷</li>
+  <li>跨模块重构，且行为边界需要被确认</li>
+  <li>API、数据契约、权限、安全、计费等高风险变更</li>
+</ul>
+
+<p>以下情况可以不单独创建 change，但仍建议补充记录：</p>
+
+<ul>
+  <li>纯文案修改</li>
+  <li>不影响行为的重构</li>
+  <li>明确无行为变化的小型内部优化</li>
+</ul>
+
+<p>判断标准只有一个：外部可观察行为是否改变。如果会变，就进入 OpenSpec。</p>
+
+<h3 id="22-第一步opsxpropose-简单需求">2.2 第一步：<code class="language-plaintext highlighter-rouge">/opsx:propose "简单需求"</code></h3>
+
+<p>常规流程的起点不是先手写一堆文档，而是先给 AI 一个足够清楚、但不必过长的需求描述。</p>
+
+<p>例如：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/opsx:propose "支持团队管理员邀请成员加入组织"
+/opsx:propose "修复订单超时后重复扣款的问题"
+</code></pre></div></div>
+
+<p>这里的“简单需求”不是指业务简单，而是指表达要聚焦，至少包含：</p>
+
+<ul>
+  <li>目标是什么</li>
+  <li>主要使用者或对象是谁</li>
+  <li>最关键的行为变化是什么</li>
+</ul>
+
+<p>如果一句话还说不清楚，应该先探索/opsx:explore，不要直接 propose。</p>
+
+<h3 id="23-第二步ai-总结需求并生成-change">2.3 第二步：AI 总结需求并生成 change</h3>
+
+<p><code class="language-plaintext highlighter-rouge">propose</code> 之后，AI 应负责把自然语言需求整理成一个完整的 change，并生成 change name。</p>
+
+<p>每个 change 必须是一个独立的逻辑单元，命名使用 kebab-case，例如：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>add-member-invite
+fix-order-timeout-retry
+refine-billing-permission-check
+</code></pre></div></div>
+
+<p>命名要求：</p>
+
+<ul>
+  <li>体现业务意图，而不是技术动作</li>
+  <li>不使用 <code class="language-plaintext highlighter-rouge">misc</code>、<code class="language-plaintext highlighter-rouge">update</code>、<code class="language-plaintext highlighter-rouge">test-change</code>、<code class="language-plaintext highlighter-rouge">wip</code> 这类无意义名称</li>
+  <li>一个 change 不混入多个彼此独立的目标</li>
+</ul>
+
+<p>AI 生成的常规产出应包括：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>文件</th>
+      <th>是否必需</th>
+      <th>作用</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">proposal.md</code></td>
+      <td>必需</td>
+      <td>说明背景、目标、范围边界</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">specs/.../spec.md</code></td>
+      <td>必需</td>
+      <td>说明本次行为变更</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">tasks.md</code></td>
+      <td>必需</td>
+      <td>把工作拆成可执行步骤</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">design.md</code></td>
+      <td>常规建议生成</td>
+      <td>先给出默认设计方案，复杂场景再补充细化</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>团队要求的最低标准如下。AI 可以先生成初稿，但不能把初稿直接视为最终版本。</p>
+
+<p><code class="language-plaintext highlighter-rouge">proposal.md</code> 至少回答三件事：</p>
+
+<ul>
+  <li>为什么做</li>
+  <li>本次要交付什么</li>
+  <li>明确不做什么</li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">delta spec</code> 至少回答两件事：</p>
+
+<ul>
+  <li>哪些行为新增、修改或删除</li>
+  <li>每条 requirement 如何通过 scenario 被验证</li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">tasks.md</code> 至少回答两件事：</p>
+
+<ul>
+  <li>实现顺序</li>
+  <li>完成标志</li>
+</ul>
+
+<h3 id="24-第三步开发-review-产出物并和-ai-迭代到可开发">2.4 第三步：开发 review 产出物，并和 AI 迭代到可开发</h3>
+
+<p>这一步是常规流程里的重点。<code class="language-plaintext highlighter-rouge">propose</code> 的价值不是“一次生成就完成”，而是让 AI 先产出一个足够完整的初稿，再由开发者进行 review，并和 AI 往返迭代，直到 change 可进入开发。</p>
+
+<p>开发者在这一阶段要重点确认：</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">proposal.md</code> 没有明显歧义</li>
+  <li>delta spec 已覆盖本次受影响的行为</li>
+  <li><code class="language-plaintext highlighter-rouge">tasks.md</code> 可以指导实现，而不是空泛待办</li>
+  <li><code class="language-plaintext highlighter-rouge">design.md</code> 的方案方向是否合理，是否遗漏关键约束</li>
+</ul>
+
+<p>开发者与 AI 的典型迭代动作包括：</p>
+
+<ul>
+  <li>补充遗漏的 requirement 或 scenario</li>
+  <li>删除不属于本次范围的内容</li>
+  <li>调整 change name，让意图更准确</li>
+  <li>修正 design 中不符合现有架构的方案</li>
+  <li>重排 tasks，使其更符合实际开发顺序</li>
+</ul>
+
+<p>如果以上条件不满足，不应直接开始实现。否则很容易出现“代码先跑起来，spec 事后补”的倒挂。</p>
+
+<h3 id="25-第四步opsxapply-生成代码">2.5 第四步：<code class="language-plaintext highlighter-rouge">/opsx:apply</code> 生成代码</h3>
+
+<p>当产出物已经被 review 到“可开发”状态后，再进入 <code class="language-plaintext highlighter-rouge">apply</code>。此时 AI 生成代码的依据应是已经确认过的 change，而不是最初那句自然语言需求。</p>
+
+<p>开发阶段的工作原则：</p>
+
+<ul>
+  <li>代码实现必须能映射回 requirement 和 scenario</li>
+  <li>未在 spec 中定义的行为，不要在实现时自行扩展</li>
+  <li>发现 spec 不足时，先补 change，再继续写代码</li>
+</ul>
+
+<p>推荐执行方式：</p>
+
+<ol>
+  <li>先按 <code class="language-plaintext highlighter-rouge">tasks.md</code> 拆分实现顺序。</li>
+  <li>每完成一块，就回看对应 scenario 是否已被满足。</li>
+  <li>如实现方案偏离原设计，先更新 <code class="language-plaintext highlighter-rouge">design.md</code> 或 delta spec。</li>
+</ol>
+
+<h3 id="26-第五步review-并测试代码">2.6 第五步：review 并测试代码</h3>
+
+<p><code class="language-plaintext highlighter-rouge">apply</code> 之后，不能直接 archive。必须先做代码 review 和测试验证。</p>
+
+<p>这一阶段至少包含两类动作：</p>
+
+<ul>
+  <li>review 代码是否正确落实 proposal、spec、design、tasks</li>
+  <li>测试代码是否满足关键 scenario，且没有引入明显回归</li>
+</ul>
+
+<p>这里的测试策略、覆盖范围、由谁来测，确实值得单独展开讨论；当前版本先把它作为强制步骤保留下来。</p>
+
+<p>review 和测试的目标不是“代码能跑”就结束，而是确认以下三层一致性：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>检查层</th>
+      <th>核心问题</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>完整性</td>
+      <td>tasks 是否全部完成，是否有遗漏 requirement</td>
+    </tr>
+    <tr>
+      <td>正确性</td>
+      <td>实现结果是否符合 scenario，而不是只满足开发者主观理解</td>
+    </tr>
+    <tr>
+      <td>一致性</td>
+      <td>proposal、spec、design、代码、测试之间是否相互矛盾</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>团队至少应完成以下检查：</p>
+
+<ul>
+  <li>requirement 是否都有对应实现</li>
+  <li>关键 scenario 是否有测试或可验证手段</li>
+  <li>代码中是否引入了 spec 没有定义的新行为</li>
+  <li><code class="language-plaintext highlighter-rouge">tasks.md</code> 是否已更新为真实完成状态</li>
+</ul>
+
+<h3 id="27-第六步opsxarchive">2.7 第六步：<code class="language-plaintext highlighter-rouge">/opsx:archive</code></h3>
+
+<p>满足以下条件后才能 archive：</p>
+
+<ul>
+  <li>本次 change 的任务已完成</li>
+  <li>验证已通过，或遗留问题已明确记录</li>
+  <li>delta spec 可以安全并入 <code class="language-plaintext highlighter-rouge">openspec/specs/</code></li>
+</ul>
+
+<p>archive 的本质不是“移动文件”，而是确认：</p>
+
+<ul>
+  <li>这次 change 已经成为系统当前事实</li>
+  <li>后续团队成员应从 <code class="language-plaintext highlighter-rouge">specs/</code> 理解当前行为</li>
+  <li>历史讨论保留在 archive 中，不污染当前事实</li>
+</ul>
+
+<hr />
+
+<h2 id="3-非常规处理流程">3. 非常规处理流程</h2>
+
+<p>非常规流程的目标不是绕过 OpenSpec，而是在现实开发过程中，给团队一个一致的纠偏方式。</p>
+
+<h3 id="31-需求未澄清不能直接-propose">3.1 需求未澄清，不能直接 propose</h3>
+
+<p>如果需求本身还不清楚，不要急着写 delta spec。先做一次探索，再形成 change。</p>
+
+<p>探索阶段可以做的事：</p>
+
+<ul>
+  <li>阅读现有代码和已有 spec</li>
+  <li>列出问题边界和未决问题</li>
+  <li>输出候选方案与取舍</li>
+</ul>
+
+<p>只有在“行为边界基本明确”后，才进入正式 change。</p>
+
+<h3 id="32-开发中发现-spec-写错了">3.2 开发中发现 spec 写错了</h3>
+
+<p>这是最常见的非常规情况。处理原则：</p>
+
+<ul>
+  <li>不要让代码偷偷偏离 spec</li>
+  <li>先修正 change 中的 spec，再继续实现</li>
+  <li>若影响范围较大，应重新评审 proposal 和 tasks</li>
+</ul>
+
+<p>简单说，正确顺序是：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>发现 spec 不准确
+→ 更新 change 中的 artifacts
+→ 重新确认范围
+→ 继续开发
+</code></pre></div></div>
+
+<p>而不是：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>先把代码改对
+→ 最后想起来再补 spec
+</code></pre></div></div>
+
+<h3 id="33-范围扩大时如何处理">3.3 范围扩大时如何处理</h3>
+
+<p>实现过程中如果发现“顺手做一下”会明显扩大范围，按下面规则判断：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>情况</th>
+      <th>处理方式</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>仍然服务于同一个目标，只是细节调整</td>
+      <td>更新当前 change</td>
+    </tr>
+    <tr>
+      <td>变成另一个独立目标</td>
+      <td>新建 change</td>
+    </tr>
+    <tr>
+      <td>原 change 已接近完成，新内容属于下一轮迭代</td>
+      <td>先 archive 原 change，再开新 change</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>团队不允许把多个独立目标堆在一个 change 里，否则会同时破坏评审、回溯和归档质量。</p>
+
+<h3 id="34-紧急修复如何处理">3.4 紧急修复如何处理</h3>
+
+<p>线上故障或高优先级缺陷允许先修复，但不能跳过补录。</p>
+
+<p>推荐流程：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>先止血
+→ 立即创建补录 change
+→ 回填 proposal / delta spec / tasks
+→ 验证实际修复行为
+→ archive
+</code></pre></div></div>
+
+<p>这里的关键要求是“允许先修”，但“不允许不补”。</p>
+
+<h3 id="35-多个-change-并行修改同一-spec">3.5 多个 change 并行修改同一 spec</h3>
+
+<p>并行开发时，最容易出现两个问题：</p>
+
+<ul>
+  <li>同一 requirement 被不同 change 重复修改</li>
+  <li>A change 依赖 B change，但双方都按自己假设在推进</li>
+</ul>
+
+<p>团队处理规则：</p>
+
+<ul>
+  <li>谁先 archive，谁先成为基线</li>
+  <li>后归档的 change 必须基于最新 <code class="language-plaintext highlighter-rouge">specs/</code> 重新检查 delta</li>
+  <li>发现冲突时，优先调整 change，而不是强行合并含糊描述</li>
+</ul>
+
+<h3 id="36-change-做废了怎么办">3.6 change 做废了怎么办</h3>
+
+<p>以下情况应主动终止或重建 change：</p>
+
+<ul>
+  <li>需求被取消</li>
+  <li>方案被证明不成立</li>
+  <li>原有 change 已经无法反映真实工作内容</li>
+</ul>
+
+<p>处理方式：</p>
+
+<ul>
+  <li>若仅停止开发，可在 change 中记录终止原因，不 archive 到当前 spec</li>
+  <li>若已有部分内容仍有价值，拆分为新的、更小的 change</li>
+</ul>
+
+<p>不要保留长期无人处理的“僵尸 change”。</p>
+
+<hr />
+
+<h2 id="4-best-practices">4. Best Practices</h2>
+
+<h3 id="41-先写行为后写实现">4.1 先写行为，后写实现</h3>
+
+<p>最常见的问题是把 spec 写成设计文档。团队应强制区分：</p>
+
+<ul>
+  <li>spec 说“系统应该表现成什么样”</li>
+  <li>design 说“系统准备怎么做”</li>
+</ul>
+
+<p>如果一条描述里出现数据库表名、类名、框架 API、消息队列主题名，它大概率不属于 spec。</p>
+
+<h3 id="42-一个-change-只解决一个问题">4.2 一个 change 只解决一个问题</h3>
+
+<p>好的 change 应该满足：</p>
+
+<ul>
+  <li>可以独立理解</li>
+  <li>可以独立评审</li>
+  <li>可以独立上线或归档</li>
+</ul>
+
+<p>如果一个 change 同时包含“新功能 + 重构 + 清理历史问题”，通常说明拆分粒度已经失控。</p>
+
+<h3 id="43-requirement-要可验证">4.3 requirement 要可验证</h3>
+
+<p>不要写抽象空话，例如：</p>
+
+<ul>
+  <li>系统应有良好的性能</li>
+  <li>页面应更易用</li>
+  <li>接口应更稳定</li>
+</ul>
+
+<p>更好的写法是写成可验证行为，例如：</p>
+
+<ul>
+  <li>当订单列表超过 1000 条时，系统必须支持按创建时间分页查询</li>
+  <li>当用户权限不足时，系统必须返回 403，而不是空结果</li>
+</ul>
+
+<p>可验证，才可实现；可实现，才可归档。</p>
+
+<h3 id="44-scenario-覆盖关键路径即可但不能漏边界">4.4 scenario 覆盖关键路径即可，但不能漏边界</h3>
+
+<p>不是每个 requirement 都要写很多 scenario，但至少应覆盖：</p>
+
+<ul>
+  <li>主成功路径</li>
+  <li>关键失败路径</li>
+  <li>明显的权限、状态或输入边界</li>
+</ul>
+
+<p>对于高风险变更，必须比日常变更多写一层异常路径。</p>
+
+<h3 id="45-tasks-要面向执行不要面向汇报">4.5 tasks 要面向执行，不要面向汇报</h3>
+
+<p>好的 <code class="language-plaintext highlighter-rouge">tasks.md</code> 应该让开发者和 AI 都能直接执行，例如：</p>
+
+<ul>
+  <li>更新 invitation 创建接口与权限校验</li>
+  <li>补充 member invite 成功与重复邀请测试</li>
+  <li>更新后台邀请列表的状态展示</li>
+</ul>
+
+<p>不好的任务写法通常是：</p>
+
+<ul>
+  <li>完成后端开发</li>
+  <li>优化逻辑</li>
+  <li>联调一下</li>
+</ul>
+
+<h3 id="46-评审时优先看边界而不是优先看篇幅">4.6 评审时优先看边界，而不是优先看篇幅</h3>
+
+<p>团队评审 change 时，不要先问“文档写得多不多”，而要先问：</p>
+
+<ul>
+  <li>目标是否单一</li>
+  <li>In scope / Out of scope 是否清晰</li>
+  <li>requirement 是否可验证</li>
+  <li>是否定义了失败场景和边界条件</li>
+  <li>是否存在实现先行、spec 落后的迹象</li>
+</ul>
+
+<h3 id="47-archive-不是收尾动作而是质量门">4.7 archive 不是收尾动作，而是质量门</h3>
+
+<p>很多团队把 archive 当成机械操作，这会导致 <code class="language-plaintext highlighter-rouge">specs/</code> 很快失真。正确做法是把 archive 当成质量门：</p>
+
+<ul>
+  <li>没验证，不 archive</li>
+  <li>有已知偏差但未记录，不 archive</li>
+  <li>行为仍说不清楚，不 archive</li>
+</ul>
+
+<p>只有可被后续团队成员直接信任的内容，才能进入 <code class="language-plaintext highlighter-rouge">specs/</code>。</p>
+
+<h3 id="48-团队落地建议">4.8 团队落地建议</h3>
+
+<p>如果要把 OpenSpec 作为团队规范落地，建议至少统一以下约定：</p>
+
+<ul>
+  <li>什么类型的工作必须建 change</li>
+  <li><code class="language-plaintext highlighter-rouge">proposal.md</code>、delta spec、<code class="language-plaintext highlighter-rouge">tasks.md</code> 的最低质量标准</li>
+  <li>谁负责评审 change 进入开发</li>
+  <li>谁负责在合并前完成验证</li>
+  <li>archive 的触发时机和责任人</li>
+</ul>
+
+<p>如果这些约定不统一，OpenSpec 很容易退化成“有人写、有人不写、最后没人信”的形式主义。</p>
+
+  </div>
+</article>
+
+  </main>
+  <footer>
+    <a href="/fun-notes/">← Back to notes</a>
+  </footer>
+</body>
+</html>

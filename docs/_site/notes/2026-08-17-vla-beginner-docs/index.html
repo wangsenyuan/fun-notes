@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VLA Beginner Docs — a reading list — Fun Notes</title>
+  <link rel="stylesheet" href="/fun-notes/css/style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/fun-notes/">Fun Notes</a>
+    </nav>
+  </header>
+  <main>
+    <article class="note">
+  <header>
+    <h1>VLA Beginner Docs — a reading list</h1>
+    
+    <div class="meta">
+      <span>August 17, 2026</span>
+      
+      <span class="tags">robotics,, VLA,, LeRobot,, beginner,, docs</span>
+      
+    </div>
+    
+  </header>
+  <div class="content">
+    <p>Start with <strong>LeRobot docs and Colabs</strong>, not the 7B papers. ACT first (imitation learning), then SmolVLA (your first real VLA). The <a href="/fun-notes/notes/2026-08-17-vla-basics/">VLA basics note</a> is the concept map; this page is the official docs in a sensible order.</p>
+
+<hr />
+
+<h2 id="read-in-this-order">Read in this order</h2>
+
+<h3 id="1-concepts-no-gpu-no-robot">1. Concepts (no GPU, no robot)</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Doc</th>
+      <th>Why</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://huggingface.co/learn/robotics-course/en/unit0/1">🤗 Robotics Course — welcome</a></td>
+      <td>Beginner syllabus. Python is enough. Units 5–7 (RL / IL / foundation models) are still rolling out.</td>
+    </tr>
+    <tr>
+      <td><a href="https://huggingface.co/learn/robotics-course/en/unit1/1">Unit 1 — robot learning</a></td>
+      <td>Why we train from data instead of writing a planner.</td>
+    </tr>
+    <tr>
+      <td><a href="https://huggingface.co/learn/robotics-course/en/unit1/2">Unit 1 — what LeRobot is</a></td>
+      <td>The library you will actually run.</td>
+    </tr>
+    <tr>
+      <td><a href="https://huggingface.co/spaces/lerobot/robot-learning-tutorial">Robot Learning Tutorial</a></td>
+      <td>Longer companion (classical robotics → RL → imitation → foundation models). Skim until you need depth.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="2-install-and-the-cli-map">2. Install and the CLI map</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Doc</th>
+      <th>Why</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://huggingface.co/docs/lerobot/">LeRobot docs home</a></td>
+      <td>The four-step loop: <strong>teleoperate → record → train → deploy</strong>. Pick “I have a robot” or “no hardware yet.”</td>
+    </tr>
+    <tr>
+      <td><a href="https://huggingface.co/docs/lerobot/installation">Installation</a></td>
+      <td>Python ≥ 3.12. Use extras: <code class="language-plaintext highlighter-rouge">core_scripts</code> to record, <code class="language-plaintext highlighter-rouge">training</code> to train, <code class="language-plaintext highlighter-rouge">feetech</code> for SO-100/SO-101.</td>
+    </tr>
+    <tr>
+      <td><a href="https://huggingface.co/docs/lerobot/cheat-sheet">Cheat sheet</a></td>
+      <td>Copy-paste <code class="language-plaintext highlighter-rouge">lerobot-record</code>, <code class="language-plaintext highlighter-rouge">lerobot-train</code>, <code class="language-plaintext highlighter-rouge">lerobot-rollout</code>. Keep this tab open.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="3-first-policy-act-do-this-before-any-vla">3. First policy: ACT (do this before any VLA)</h3>
+
+<p>ACT is the recommended first policy: small, fast to train, same data format as SmolVLA.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Doc</th>
+      <th>Why</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://huggingface.co/docs/lerobot/act">ACT policy</a></td>
+      <td>What action chunking is, plus the <code class="language-plaintext highlighter-rouge">lerobot-train --policy.type=act</code> command.</td>
+    </tr>
+    <tr>
+      <td><a href="https://huggingface.co/docs/lerobot/il_robots">Imitation learning on real robots</a></td>
+      <td>End-to-end on hardware: teleop, record, train ACT, evaluate.</td>
+    </tr>
+    <tr>
+      <td><a href="https://colab.research.google.com/github/huggingface/notebooks/blob/main/lerobot/training-act.ipynb">Train ACT Colab</a></td>
+      <td>No local GPU. ~1.5 h / 100k steps on an A100; a T4 works, slower.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="4-first-vla-smolvla">4. First VLA: SmolVLA</h3>
+
+<p>Only after ACT clones a tiny skill (pick-and-place one object).</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Doc</th>
+      <th>Why</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://huggingface.co/docs/lerobot/smolvla">SmolVLA docs</a></td>
+      <td>450M VLA. Fine-tune <code class="language-plaintext highlighter-rouge">lerobot/smolvla_base</code> on ~50 of <em>your</em> episodes.</td>
+    </tr>
+    <tr>
+      <td><a href="https://huggingface.co/blog/smolvla">SmolVLA blog</a></td>
+      <td>Architecture in plain language (VLM + flow-matching action expert).</td>
+    </tr>
+    <tr>
+      <td><a href="https://colab.research.google.com/github/huggingface/notebooks/blob/main/lerobot/training-smolvla.ipynb">Train SmolVLA Colab</a></td>
+      <td>Same Hub dataset workflow as the ACT notebook. ~5 h / 20k steps on an A100.</td>
+    </tr>
+    <tr>
+      <td><a href="https://huggingface.co/docs/lerobot/notebooks">Notebooks index</a></td>
+      <td>Official Colab list.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="5-if-you-have-or-will-buy-an-arm">5. If you have (or will buy) an arm</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Doc</th>
+      <th>Why</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://huggingface.co/docs/lerobot/so101">SO-101 assembly</a></td>
+      <td>Flagship cheap arm: motors, calibrate, then jump to the IL tutorial.</td>
+    </tr>
+    <tr>
+      <td><a href="https://huggingface.co/docs/lerobot/lelab">LeLab GUI</a></td>
+      <td>Browser app for SO-101: calibrate, record, train, deploy without memorizing CLI.</td>
+    </tr>
+    <tr>
+      <td><a href="https://huggingface.co/docs/lerobot/cameras">Cameras</a></td>
+      <td>Find OpenCV / RealSense devices. Wrist + scene beats one laptop webcam.</td>
+    </tr>
+    <tr>
+      <td><a href="https://huggingface.co/blog/lerobot-datasets#what-makes-a-good-dataset">What makes a good dataset</a></td>
+      <td>Two steady views, ~30 FPS, leader arm <em>out of frame</em>, ~50 episodes, a real task sentence not <code class="language-plaintext highlighter-rouge">task1</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Target: grasp an object in a few locations and drop it in a bin. Hugging Face suggests <strong>≥ 50 episodes, ~10 per location</strong>. You should be able to do the task yourself using <strong>only</strong> the camera feeds.</p>
+
+<hr />
+
+<h2 id="weekend-path-no-robot">Weekend path (no robot)</h2>
+
+<ol>
+  <li>Robotics Course unit 0 + unit 1.</li>
+  <li>Install: <code class="language-plaintext highlighter-rouge">pip install 'lerobot[training]'</code> (or just open Colab).</li>
+  <li>Train ACT on a Hub dataset, e.g. something under <a href="https://huggingface.co/lerobot"><code class="language-plaintext highlighter-rouge">lerobot</code> on the Hub</a>.</li>
+  <li>Read the SmolVLA page and run the SmolVLA Colab on the same kind of dataset.</li>
+</ol>
+
+<h2 id="weekend-path-so-101-on-the-desk">Weekend path (SO-101 on the desk)</h2>
+
+<ol>
+  <li><a href="https://huggingface.co/docs/lerobot/so101">SO-101</a> or <a href="https://huggingface.co/docs/lerobot/lelab">LeLab</a>.</li>
+  <li>Teleop until the motion is boringly consistent.</li>
+  <li>Record ~50 pick-and-place episodes (<a href="https://huggingface.co/docs/lerobot/il_robots">IL tutorial</a> + <a href="https://huggingface.co/blog/lerobot-datasets#what-makes-a-good-dataset">dataset checklist</a>).</li>
+  <li>Train <strong>ACT</strong>. If success is near zero, fix data/cameras — do not jump to a VLA.</li>
+  <li>Fine-tune <strong>SmolVLA</strong> on the same dataset.</li>
+</ol>
+
+<hr />
+
+<h2 id="save-for-later-not-beginner">Save for later (not beginner)</h2>
+
+<p>These are real, but they assume you already have a working imitation loop.</p>
+
+<ul>
+  <li><a href="https://huggingface.co/docs/lerobot/pi0">π0 in LeRobot</a> — flow-matching VLA, heavier than SmolVLA.</li>
+  <li><a href="https://huggingface.co/openvla/openvla-7b">OpenVLA 7B model card</a> — load + <code class="language-plaintext highlighter-rouge">predict_action</code>. Needs a serious GPU; LoRA fine-tune is a separate repo.</li>
+  <li><a href="https://github.com/openvla/openvla">OpenVLA GitHub</a> — research training, not the first clone-and-train.</li>
+  <li><a href="https://robotics-transformer-x.github.io/">Open X-Embodiment</a> — the big multi-robot pretraining corpus.</li>
+</ul>
+
+<hr />
+
+<h2 id="community">Community</h2>
+
+<ul>
+  <li><a href="https://discord.gg/q8Dzzpym3f">LeRobot Discord</a> — install, cameras, and “why is success 0%” questions.</li>
+  <li>Hub search: datasets tagged <code class="language-plaintext highlighter-rouge">LeRobot</code>.</li>
+</ul>
+
+  </div>
+</article>
+
+  </main>
+  <footer>
+    <a href="/fun-notes/">← Back to notes</a>
+  </footer>
+</body>
+</html>

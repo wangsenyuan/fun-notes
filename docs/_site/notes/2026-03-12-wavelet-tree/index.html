@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wavelet Tree 核心洞察与伪代码 — Fun Notes</title>
+  <link rel="stylesheet" href="/fun-notes/css/style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/fun-notes/">Fun Notes</a>
+    </nav>
+  </header>
+  <main>
+    <article class="note">
+  <header>
+    <h1>Wavelet Tree 核心洞察与伪代码</h1>
+    
+    <div class="meta">
+      <span>March 12, 2026</span>
+      
+      <span class="tags">data-structure,, competitive-programming,, wavelet-tree,, algorithm</span>
+      
+    </div>
+    
+  </header>
+  <div class="content">
+    <p>Wavelet Tree 是一种用于<strong>对整数序列高效回答区间查询</strong>的数据结构。它的核心价值不在于压缩，而在于以 O(log σ) 的时间支持多种”第 k 小”、”区间计数”、”rank”等查询，且可以与其他结构组合扩展。</p>
+
+<hr />
+
+<h2 id="核心思想">核心思想</h2>
+
+<p><strong>把值域的二分递归嵌入到序列结构中。</strong></p>
+
+<p>给定序列 S，将值域 [l, r] 从中点 m 一分为二：</p>
+<ul>
+  <li>值 ≤ m 的元素组成左子序列</li>
+  <li>值 &gt; m 的元素组成右子序列</li>
+  <li>递归至叶节点（区间只含单一值）</li>
+</ul>
+
+<p>树高 O(log σ)，σ 是值域大小。</p>
+
+<p>关键洞察：<strong>不需要真正存储每层的子序列</strong>，只需在每个节点存一个前缀计数数组 C，记录”到位置 i 为止，有多少元素被分到右边”（即值 &gt; m）。</p>
+
+<hr />
+
+<h2 id="两个核心映射操作">两个核心映射操作</h2>
+
+<p>每个节点 v 维护数组 <code class="language-plaintext highlighter-rouge">C[0..n]</code>，其中 <code class="language-plaintext highlighter-rouge">C[i]</code> = 前 i 个元素中值 &gt; m 的个数。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 位置 i 映射到左子节点的位置
+mapLeft(v, i) = i - C[i]
+
+// 位置 i 映射到右子节点的位置
+mapRight(v, i) = C[i] - 1   // 0-indexed
+</code></pre></div></div>
+
+<p>这两个操作 O(1)，是所有查询的基础。</p>
+
+<hr />
+
+<h2 id="三种核心查询">三种核心查询</h2>
+
+<h3 id="1-rank统计出现次数">1. Rank：统计出现次数</h3>
+
+<p><code class="language-plaintext highlighter-rouge">rank(S, q, i)</code> = 序列 S 前 i 个元素中，值等于 q 的个数。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rank(node, q, i):
+    if node is leaf:
+        return i  // 叶节点所有元素都等于 q
+    if q &lt;= node.mid:
+        return rank(node.left, q, mapLeft(node, i))
+    else:
+        return rank(node.right, q, mapRight(node, i))
+</code></pre></div></div>
+
+<p>区间 [i, j] 内 q 的出现次数 = <code class="language-plaintext highlighter-rouge">rank(S, q, j) - rank(S, q, i-1)</code></p>
+
+<p><strong>复杂度：O(log σ)</strong></p>
+
+<hr />
+
+<h3 id="2-range-quantile区间第-k-小">2. Range Quantile（区间第 k 小）</h3>
+
+<p><code class="language-plaintext highlighter-rouge">quantile(S, k, i, j)</code> = 子序列 S[i..j] 中第 k 小的值。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>quantile(node, k, i, j):
+    if node is leaf:
+        return node.value
+    // 统计 [i,j] 中有多少元素去了左边
+    c = mapLeft(node, j) - mapLeft(node, i-1)
+    if k &lt;= c:
+        // 第 k 小在左子树
+        return quantile(node.left, k,
+                        mapLeft(node, i-1) + 1,
+                        mapLeft(node, j))
+    else:
+        // 第 k 小在右子树，排名变为 k-c
+        return quantile(node.right, k - c,
+                        mapRight(node, i-1) + 1,
+                        mapRight(node, j))
+</code></pre></div></div>
+
+<p><strong>关键洞察</strong>：每层只走一个分支，树高 O(log σ)，总复杂度 O(log σ)。</p>
+
+<hr />
+
+<h3 id="3-range-counting区间值域计数">3. Range Counting（区间值域计数）</h3>
+
+<p><code class="language-plaintext highlighter-rouge">range(S, [x,y], i, j)</code> = S[i..j] 中值在 [x, y] 之间的元素个数。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>range(node, x, y, i, j):
+    if [node.l, node.r] ∩ [x, y] == ∅:
+        return 0
+    if [node.l, node.r] ⊆ [x, y]:
+        return j - i + 1   // 整段都在范围内
+    // 部分重叠，递归两子树
+    return range(node.left,  x, y, mapLeft(node, i-1)+1,  mapLeft(node, j))
+         + range(node.right, x, y, mapRight(node, i-1)+1, mapRight(node, j))
+</code></pre></div></div>
+
+<p><strong>复杂度：O(log σ)</strong>（最多 O(log σ) 个递归分支）</p>
+
+<hr />
+
+<h2 id="构建">构建</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>build(A, l, r):
+    // A 是当前节点的子序列，[l,r] 是值域
+    if l == r: return leaf(l)
+    mid = (l + r) / 2
+    // 计算前缀右计数数组 C
+    C[0] = 0
+    for i in 1..len(A):
+        C[i] = C[i-1] + (A[i] &gt; mid ? 1 : 0)
+    // 稳定划分
+    A_left  = [a for a in A if a &lt;= mid]
+    A_right = [a for a in A if a &gt; mid]
+    node.left  = build(A_left,  l, mid)
+    node.right = build(A_right, mid+1, r)
+    return node
+</code></pre></div></div>
+
+<p>空间：O(n log σ)，因为每层总元素数为 n。</p>
+
+<hr />
+
+<h2 id="支持动态更新">支持动态更新</h2>
+
+<h3 id="swap交换相邻元素-i-和-i1">Swap（交换相邻元素 i 和 i+1）</h3>
+
+<p>只需沿树向下找到<strong>两个元素分配到不同子树</strong>的那层节点，更新 C 数组。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>swap(node, i):
+    // i 和 i+1 都去左边或都去右边 → 递归下去，不更新 C
+    if A[i] &lt;= mid and A[i+1] &lt;= mid:
+        swap(node.left, mapLeft(node, i))
+    elif A[i] &gt; mid and A[i+1] &gt; mid:
+        swap(node.right, mapRight(node, i))
+    else:
+        // 一个去左，一个去右 → 更新 C[i]（+1 或 -1）
+        update C[i] accordingly
+        // 不需要递归，子序列中它们不再相邻
+</code></pre></div></div>
+
+<p><strong>复杂度：O(log σ)</strong></p>
+
+<h3 id="toggle激活停用元素">Toggle（激活/停用元素）</h3>
+
+<p>每个节点额外维护 <code class="language-plaintext highlighter-rouge">activeLeft[i]</code> = 前 i 个元素中，去往左子树的<strong>活跃</strong>元素数。用 BIT（树状数组）实现以支持点更新。</p>
+
+<p>查询时将 <code class="language-plaintext highlighter-rouge">mapLeft(node, j) - mapLeft(node, i-1)</code> 替换为 <code class="language-plaintext highlighter-rouge">activeLeft(j) - activeLeft(i-1)</code>，其余逻辑不变。</p>
+
+<p><strong>复杂度：O(log n · log σ)</strong>（每层一次 BIT 操作）</p>
+
+<hr />
+
+<h2 id="wavelet-matrix大值域优化">Wavelet Matrix（大值域优化）</h2>
+
+<p>当 σ 很大（如 10⁹），指针型 Wavelet Tree 空间 O(σ) 不可接受。</p>
+
+<p><strong>Wavelet Matrix</strong> 的思路：</p>
+<ul>
+  <li>按层（而非按节点）存储，每层一个全局 bitvector</li>
+  <li>每层把所有 0（值 ≤ mid）排在前面，1（值 &gt; mid）排在后面</li>
+  <li>维护每层”有多少元素去了左边”的数量 z_l</li>
+</ul>
+
+<p>映射公式（level l）：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 位置 i 映射到下一层
+if bit[l][i] == 0:  // 去左边
+    next_pos = i - C_l[i]          // C_l[i] = 前 i 个中 1 的个数
+else:               // 去右边
+    next_pos = z_l + C_l[i] - 1
+</code></pre></div></div>
+
+<p>空间仅 O(n log σ)，不需要树指针，实现更简单。</p>
+
+<hr />
+
+<h2 id="与其他结构对比">与其他结构对比</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>结构</th>
+      <th>区间第k小</th>
+      <th>区间计数</th>
+      <th>支持swap</th>
+      <th>内存</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>归并树</td>
+      <td>O(log²n)</td>
+      <td>O(log²n)</td>
+      <td>难</td>
+      <td>O(n log n)</td>
+    </tr>
+    <tr>
+      <td>持久化线段树</td>
+      <td>O(log n)</td>
+      <td>O(log n)</td>
+      <td>需大改</td>
+      <td>O(n log n)，常数大</td>
+    </tr>
+    <tr>
+      <td>Wavelet Tree</td>
+      <td>O(log σ)</td>
+      <td>O(log σ)</td>
+      <td>O(log σ)</td>
+      <td>O(n log σ)，常数小</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="一句话总结">一句话总结</h2>
+
+<p>Wavelet Tree 的本质是：<strong>用值域的二分递归把”排名/计数”问题分解到叶节点</strong>，每层只需一个前缀计数数组 C，O(1) 完成节点间的位置映射，从而以 O(log σ) 回答各种区间有序统计查询。</p>
+
+  </div>
+</article>
+
+  </main>
+  <footer>
+    <a href="/fun-notes/">← Back to notes</a>
+  </footer>
+</body>
+</html>

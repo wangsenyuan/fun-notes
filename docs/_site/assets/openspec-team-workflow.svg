@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1360 600" role="img" aria-labelledby="title desc">
+  <title id="title">OpenSpec Team Workflow</title>
+  <desc id="desc">OpenSpec 团队规范流程图，包含初始化、propose、review、apply、测试与归档。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f7f1e8"/>
+      <stop offset="100%" stop-color="#f2efe8"/>
+    </linearGradient>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#16324f"/>
+      <stop offset="100%" stop-color="#28536b"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#28536b"/>
+    </marker>
+    <style>
+      .title { font: 700 28px "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #f8fafc; }
+      .subtitle { font: 400 14px "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #dbe4ea; }
+      .section { font: 700 18px "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #16324f; }
+      .label { font: 700 17px "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #16324f; }
+      .body { font: 400 13px "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #48606f; }
+      .small { font: 600 12px "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #7c5c2f; }
+      .chip { font: 700 12px "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #6b4f1d; }
+    </style>
+  </defs>
+
+  <rect width="1360" height="600" rx="28" fill="url(#bg)"/>
+
+  <rect x="40" y="32" width="1280" height="88" rx="22" fill="url(#hero)"/>
+  <text x="72" y="72" class="title">OpenSpec 团队常规流程</text>
+  <text x="72" y="97" class="subtitle">先初始化项目约束，再按 change 驱动需求澄清、产物评审、代码生成、测试验证和归档。</text>
+
+  <text x="60" y="156" class="section">项目初始化</text>
+  <rect x="60" y="176" width="220" height="132" rx="20" fill="#fffdf9" stroke="#d4b483" stroke-width="2"/>
+  <rect x="78" y="194" width="92" height="28" rx="14" fill="#f3e0bb"/>
+  <text x="124" y="213" text-anchor="middle" class="chip">一次性执行</text>
+  <text x="84" y="248" class="label">0. openspec init</text>
+  <text x="84" y="273" class="body">生成 `openspec/config.yaml`</text>
+  <text x="84" y="294" class="body">固化 schema / context / rules</text>
+
+  <path d="M 280 242 C 315 242, 325 242, 355 242" fill="none" stroke="#28536b" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <text x="355" y="156" class="section">日常 change 流程</text>
+
+  <rect x="355" y="176" width="150" height="132" rx="20" fill="#ffffff" stroke="#8fb8c7" stroke-width="2"/>
+  <text x="380" y="214" class="label">1. propose</text>
+  <text x="380" y="239" class="body">`/opsx:propose "简单需求"`</text>
+  <text x="380" y="260" class="body">输入目标、对象、关键行为</text>
+  <text x="380" y="281" class="body">不清楚时先 explore</text>
+
+  <path d="M 505 242 C 530 242, 540 242, 565 242" fill="none" stroke="#28536b" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <rect x="565" y="176" width="170" height="132" rx="20" fill="#fffdf9" stroke="#8fb8c7" stroke-width="2"/>
+  <text x="590" y="214" class="label">2. AI 生成 change</text>
+  <text x="590" y="239" class="body">总结需求并命名 change</text>
+  <text x="590" y="260" class="body">输出 spec / proposal</text>
+  <text x="590" y="281" class="body">design / tasks 初稿</text>
+
+  <path d="M 735 242 C 760 242, 770 242, 795 242" fill="none" stroke="#28536b" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <rect x="795" y="176" width="190" height="132" rx="20" fill="#fffdf9" stroke="#8fb8c7" stroke-width="2"/>
+  <text x="820" y="214" class="label">3. 开发 review 产物</text>
+  <text x="820" y="239" class="body">和 AI 迭代 scope / scenarios</text>
+  <text x="820" y="260" class="body">修正 design 与 tasks</text>
+  <text x="820" y="281" class="body">直到 change 可开发</text>
+
+  <path d="M 890 322 C 890 372, 685 372, 685 322" fill="none" stroke="#c18c3c" stroke-width="3" stroke-dasharray="8 8" marker-end="url(#arrow)"/>
+  <text x="705" y="395" class="small">不满足时回到第 2 步继续迭代</text>
+
+  <path d="M 985 242 C 1010 242, 1020 242, 1045 242" fill="none" stroke="#28536b" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <rect x="1045" y="176" width="170" height="132" rx="20" fill="#ffffff" stroke="#8fb8c7" stroke-width="2"/>
+  <text x="1070" y="214" class="label">4. apply 生成代码</text>
+  <text x="1070" y="239" class="body">`/opsx:apply`</text>
+  <text x="1070" y="260" class="body">按已确认 change 落地</text>
+  <text x="1070" y="281" class="body">实现必须映射 spec</text>
+
+  <path d="M 1130 308 L 1130 388" fill="none" stroke="#28536b" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <rect x="1100" y="388" width="170" height="126" rx="20" fill="#fffdf9" stroke="#8fb8c7" stroke-width="2"/>
+  <text x="1125" y="425" class="label">5. review 与测试</text>
+  <text x="1125" y="450" class="body">检查 proposal / spec</text>
+  <text x="1125" y="471" class="body">验证关键 scenario</text>
+  <text x="1125" y="492" class="body">未通过则回改代码或产物</text>
+
+
+  <!-- 5 → 6：从5左边向左到6右边 -->
+  <path d="M 1100 451 L 1042 451" fill="none" stroke="#28536b" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <rect x="870" y="388" width="170" height="126" rx="20" fill="#ffffff" stroke="#8fb8c7" stroke-width="2"/>
+  <text x="895" y="425" class="label">6. archive</text>
+  <text x="895" y="450" class="body">`/opsx:archive`</text>
+  <text x="895" y="471" class="body">并入当前 spec</text>
+  <text x="895" y="492" class="body">保存历史 change</text>
+
+  <rect x="60" y="360" width="760" height="154" rx="22" fill="#fffaf1" stroke="#d4b483" stroke-width="2"/>
+  <text x="86" y="398" class="section">团队执行要点</text>
+  <text x="86" y="430" class="body">1. `init` 是项目级前置动作，只做一次，主要负责配置，不是每次 change 都跑。</text>
+  <text x="86" y="456" class="body">2. `propose` 后先 review artifacts，再 `apply`，不要跳过产物确认直接写代码。</text>
+  <text x="86" y="482" class="body">3. review 或测试发现问题时，允许回退，但必须把 spec、design、tasks 和代码同步修正。</text>
+ </svg>

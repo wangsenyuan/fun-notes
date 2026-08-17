@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Claude Code — Agents, Skills, Plugins — Fun Notes</title>
+  <link rel="stylesheet" href="/fun-notes/css/style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/fun-notes/">Fun Notes</a>
+    </nav>
+  </header>
+  <main>
+    <article class="note">
+  <header>
+    <h1>Claude Code — Agents, Skills, Plugins</h1>
+    
+    <div class="meta">
+      <span>March 03, 2026</span>
+      
+      <span class="tags">AI,, Claude,, agents,, skills,, plugins,, automation</span>
+      
+    </div>
+    
+  </header>
+  <div class="content">
+    <h2 id="overview">Overview</h2>
+
+<p>Claude Code extends beyond the base model through a layered extensibility system: <strong>agents</strong> (specialized subagents), <strong>skills</strong> (packaged expertise and workflows), and <strong>plugins</strong> (bundles of all of the above). Together they let you tailor Claude to your project and team.</p>
+
+<hr />
+
+<h2 id="skills">Skills</h2>
+
+<p>Skills are markdown files (<code class="language-plaintext highlighter-rouge">SKILL.md</code>) that teach Claude how to perform specific tasks. Claude can invoke them automatically when context suggests they’re relevant, or you can invoke them manually via <code class="language-plaintext highlighter-rouge">/skill-name</code>.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Aspect</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Structure</strong></td>
+      <td>Directory with <code class="language-plaintext highlighter-rouge">SKILL.md</code>, optional <code class="language-plaintext highlighter-rouge">reference.md</code>, <code class="language-plaintext highlighter-rouge">examples.md</code>, <code class="language-plaintext highlighter-rouge">scripts/</code></td>
+    </tr>
+    <tr>
+      <td><strong>Locations</strong></td>
+      <td>User: <code class="language-plaintext highlighter-rouge">~/.claude/skills/</code> — Project: <code class="language-plaintext highlighter-rouge">.claude/skills/</code> — Plugin: bundled in plugin</td>
+    </tr>
+    <tr>
+      <td><strong>Invocation</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">disable-model-invocation: true</code> → user-only (deploy, commit, send)</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td><code class="language-plaintext highlighter-rouge">user-invocable: false</code> → Claude-only (background knowledge)</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td>Default → both can invoke</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>When to create skills:</strong></p>
+<ul>
+  <li>Frequently repeated prompts or workflows</li>
+  <li>Project-specific tasks with arguments</li>
+  <li>Applying templates or scripts</li>
+  <li>Workflows that should run in isolation (<code class="language-plaintext highlighter-rouge">context: fork</code>)</li>
+</ul>
+
+<hr />
+
+<h2 id="agents-subagents">Agents (Subagents)</h2>
+
+<p>Agents are specialized subagents Claude invokes for specific domains. They run in parallel, have their own system prompts, and can use tools.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Use Case</th>
+      <th>Agent Type</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Large codebase (&gt;500 files)</td>
+      <td><strong>code-reviewer</strong> — parallel code review</td>
+    </tr>
+    <tr>
+      <td>Auth/payments code</td>
+      <td><strong>security-reviewer</strong> — security audits</td>
+    </tr>
+    <tr>
+      <td>API project</td>
+      <td><strong>api-documenter</strong> — OpenAPI generation</td>
+    </tr>
+    <tr>
+      <td>Performance critical</td>
+      <td><strong>performance-analyzer</strong> — bottleneck detection</td>
+    </tr>
+    <tr>
+      <td>Frontend heavy</td>
+      <td><strong>ui-reviewer</strong> — accessibility review</td>
+    </tr>
+    <tr>
+      <td>Needs more tests</td>
+      <td><strong>test-writer</strong> — test generation</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Location:</strong> <code class="language-plaintext highlighter-rouge">.claude/agents/&lt;name&gt;.md</code></p>
+
+<hr />
+
+<h2 id="skills-vs-subagents">Skills vs Subagents</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Aspect</th>
+      <th>Skill</th>
+      <th>Subagent</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>What it is</strong></td>
+      <td>Instructions the current agent follows</td>
+      <td>Separate agent instance</td>
+    </tr>
+    <tr>
+      <td><strong>Context</strong></td>
+      <td>Same as main agent</td>
+      <td>Isolated / focused</td>
+    </tr>
+    <tr>
+      <td><strong>Execution</strong></td>
+      <td>Main agent applies the skill</td>
+      <td>Runs autonomously with its own tools</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>When to use skills:</strong> Single task, linear workflow, context sharing is useful.</p>
+
+<p><strong>When to use subagents:</strong></p>
+<ul>
+  <li><strong>Focus</strong> — Main agent accumulates too much context and drifts. Subagents stay on one job.</li>
+  <li><strong>Fresh perspective</strong> — Subagent reviews “cold” without main agent’s assumptions; catches what the main agent misses.</li>
+  <li><strong>Parallelism</strong> — Run security + performance + code review at once.</li>
+  <li><strong>Isolation</strong> — Different tool permissions, smaller context, failure containment.</li>
+</ul>
+
+<blockquote>
+  <p>Skills extend the current agent. Subagents delegate to a separate agent. Use subagents when you need independence, parallelism, or focus — not just different instructions.</p>
+</blockquote>
+
+<hr />
+
+<h2 id="plugins">Plugins</h2>
+
+<p>Plugins are self-contained directories that bundle multiple extension types. One install gives you skills, agents, hooks, MCP servers, and optionally LSP servers.</p>
+
+<h3 id="plugin-structure">Plugin Structure</h3>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>plugin-name/
+├── .claude-plugin/plugin.json   # required manifest
+├── commands/                    # slash commands
+├── agents/                      # subagent definitions
+├── skills/                      # agent skills
+├── hooks/                       # event handlers (hooks.json)
+├── .mcp.json                    # MCP server config
+└── scripts/
+</code></pre></div></div>
+
+<h3 id="plugin-components">Plugin Components</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Component</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Skills</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">/name</code> shortcuts, model-invoked capabilities</td>
+    </tr>
+    <tr>
+      <td><strong>Agents</strong></td>
+      <td>Specialized subagents for specific tasks</td>
+    </tr>
+    <tr>
+      <td><strong>Commands</strong></td>
+      <td>Custom slash commands</td>
+    </tr>
+    <tr>
+      <td><strong>Hooks</strong></td>
+      <td>Event handlers (PreToolUse, PostToolUse, etc.)</td>
+    </tr>
+    <tr>
+      <td><strong>MCP servers</strong></td>
+      <td>External tool integrations (DBs, APIs, browsers)</td>
+    </tr>
+    <tr>
+      <td><strong>LSP servers</strong></td>
+      <td>Language intelligence for code navigation</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="hook-events-examples">Hook Events (examples)</h3>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">PreToolUse</code> / <code class="language-plaintext highlighter-rouge">PostToolUse</code> — before/after tool execution</li>
+  <li><code class="language-plaintext highlighter-rouge">PostToolUseFailure</code> — after tool execution fails</li>
+  <li><code class="language-plaintext highlighter-rouge">SessionStart</code> / <code class="language-plaintext highlighter-rouge">SessionEnd</code></li>
+  <li><code class="language-plaintext highlighter-rouge">UserPromptSubmit</code></li>
+  <li><code class="language-plaintext highlighter-rouge">SubagentStart</code> / <code class="language-plaintext highlighter-rouge">SubagentStop</code></li>
+</ul>
+
+<hr />
+
+<h2 id="automation-types-at-a-glance">Automation Types at a Glance</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Best For</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Hooks</strong></td>
+      <td>Automatic actions on tool events (format on save, lint, block edits)</td>
+    </tr>
+    <tr>
+      <td><strong>Subagents</strong></td>
+      <td>Specialized reviewers/analyzers that run in parallel</td>
+    </tr>
+    <tr>
+      <td><strong>Skills</strong></td>
+      <td>Packaged expertise, workflows, repeatable tasks</td>
+    </tr>
+    <tr>
+      <td><strong>Plugins</strong></td>
+      <td>Collections of skills (and agents, hooks, MCP) — install as a unit</td>
+    </tr>
+    <tr>
+      <td><strong>MCP Servers</strong></td>
+      <td>External tool integrations (databases, APIs, docs)</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="discovery--install">Discovery &amp; Install</h2>
+
+<ul>
+  <li><strong>Community registry:</strong> <a href="https://www.claude-plugins.dev/">claude-plugins.dev</a> — CLI for discovering and installing plugins</li>
+  <li><strong>Official marketplace:</strong> Search in Claude Code’s <code class="language-plaintext highlighter-rouge">/plugin</code> Discover tab</li>
+  <li><strong>MCP servers:</strong> <code class="language-plaintext highlighter-rouge">claude mcp add &lt;server-name&gt;</code> (e.g. <code class="language-plaintext highlighter-rouge">context7</code>, <code class="language-plaintext highlighter-rouge">playwright</code>, <code class="language-plaintext highlighter-rouge">github</code>)</li>
+</ul>
+
+<hr />
+
+<h2 id="plugin-distribution-without-official-marketplace">Plugin Distribution (Without Official Marketplace)</h2>
+
+<p>To distribute plugins without publishing to the official Anthropic marketplace:</p>
+
+<p><strong>1. Custom marketplace</strong> — Host a <code class="language-plaintext highlighter-rouge">marketplace.json</code> that catalogs your plugins. Users add it with:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/plugin marketplace add ./my-marketplace              <span class="c"># local path</span>
+/plugin marketplace add owner/repo                    <span class="c"># GitHub</span>
+/plugin marketplace add https://gitlab.com/company/plugins.git
+/plugin marketplace add https://example.com/marketplace.json
+</code></pre></div></div>
+
+<p>Then install plugins from that marketplace via <code class="language-plaintext highlighter-rouge">/plugin install</code>.</p>
+
+<p><strong>2. Git repo</strong> — Put the plugin in a public or private repo. If the repo root has a <code class="language-plaintext highlighter-rouge">marketplace.json</code> that references the plugin, users add the repo as a marketplace and install from there.</p>
+
+<p><strong>3. Local / direct share</strong> — For internal use: share the plugin directory (zip, clone, copy). Users run <code class="language-plaintext highlighter-rouge">claude --plugin-dir ./path-to-plugin</code> or add a local marketplace pointing to that path.</p>
+
+<p><strong>4. Community registry</strong> — Publish to <a href="https://www.claude-plugins.dev/">claude-plugins.dev</a> instead of the official marketplace.</p>
+
+<hr />
+
+<h2 id="key-insight">Key Insight</h2>
+
+<blockquote>
+  <p>Skills teach <em>what</em> to do. Agents specialize <em>who</em> does it. Plugins package both for reuse. Hooks and MCP servers handle <em>when</em> and <em>with what tools</em> — the glue that makes automation automatic.</p>
+</blockquote>
+
+  </div>
+</article>
+
+  </main>
+  <footer>
+    <a href="/fun-notes/">← Back to notes</a>
+  </footer>
+</body>
+</html>

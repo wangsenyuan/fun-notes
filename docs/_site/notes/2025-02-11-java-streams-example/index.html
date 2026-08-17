@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Java Streams Cheatsheet — Fun Notes</title>
+  <link rel="stylesheet" href="/fun-notes/css/style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/fun-notes/">Fun Notes</a>
+    </nav>
+  </header>
+  <main>
+    <article class="note">
+  <header>
+    <h1>Java Streams Cheatsheet</h1>
+    
+    <div class="meta">
+      <span>February 11, 2025</span>
+      
+      <span class="tags">java,, programming</span>
+      
+    </div>
+    
+  </header>
+  <div class="content">
+    <p>A quick reference for common Java Stream operations.</p>
+
+<h2 id="creating-streams">Creating Streams</h2>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="nc">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span> <span class="s">"b"</span><span class="o">,</span> <span class="s">"c"</span><span class="o">);</span>
+<span class="nc">Stream</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">s1</span> <span class="o">=</span> <span class="n">list</span><span class="o">.</span><span class="na">stream</span><span class="o">();</span>
+
+<span class="nc">String</span><span class="o">[]</span> <span class="n">arr</span> <span class="o">=</span> <span class="o">{</span><span class="s">"x"</span><span class="o">,</span> <span class="s">"y"</span><span class="o">,</span> <span class="s">"z"</span><span class="o">};</span>
+<span class="nc">Stream</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">s2</span> <span class="o">=</span> <span class="nc">Arrays</span><span class="o">.</span><span class="na">stream</span><span class="o">(</span><span class="n">arr</span><span class="o">);</span>
+
+<span class="nc">Stream</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">&gt;</span> <span class="n">s3</span> <span class="o">=</span> <span class="nc">Stream</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">3</span><span class="o">);</span>
+</code></pre></div></div>
+
+<h2 id="common-operations">Common Operations</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Operation</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">filter(predicate)</code></td>
+      <td>Keep elements matching predicate</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">map(function)</code></td>
+      <td>Transform each element</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">flatMap(function)</code></td>
+      <td>Flatten nested structures</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">sorted()</code></td>
+      <td>Sort (natural order)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">distinct()</code></td>
+      <td>Remove duplicates</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">limit(n)</code></td>
+      <td>Take first n elements</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">skip(n)</code></td>
+      <td>Skip first n elements</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="collectors">Collectors</h2>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="na">collect</span><span class="o">(</span><span class="nc">Collectors</span><span class="o">.</span><span class="na">toList</span><span class="o">());</span>
+<span class="nc">Set</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">set</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="na">collect</span><span class="o">(</span><span class="nc">Collectors</span><span class="o">.</span><span class="na">toSet</span><span class="o">());</span>
+<span class="nc">String</span> <span class="n">joined</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="na">collect</span><span class="o">(</span><span class="nc">Collectors</span><span class="o">.</span><span class="na">joining</span><span class="o">(</span><span class="s">", "</span><span class="o">));</span>
+<span class="nc">Map</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span> <span class="no">V</span><span class="o">&gt;</span> <span class="n">map</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="na">collect</span><span class="o">(</span><span class="nc">Collectors</span><span class="o">.</span><span class="na">toMap</span><span class="o">(</span><span class="n">k</span> <span class="o">-&gt;</span> <span class="n">k</span><span class="o">,</span> <span class="n">v</span> <span class="o">-&gt;</span> <span class="n">v</span><span class="o">));</span>
+</code></pre></div></div>
+
+<h2 id="example-filter-and-map">Example: Filter and Map</h2>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">result</span> <span class="o">=</span> <span class="n">names</span><span class="o">.</span><span class="na">stream</span><span class="o">()</span>
+    <span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="n">n</span> <span class="o">-&gt;</span> <span class="n">n</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="nl">String:</span><span class="o">:</span><span class="n">toUpperCase</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">collect</span><span class="o">(</span><span class="nc">Collectors</span><span class="o">.</span><span class="na">toList</span><span class="o">());</span>
+</code></pre></div></div>
+
+  </div>
+</article>
+
+  </main>
+  <footer>
+    <a href="/fun-notes/">← Back to notes</a>
+  </footer>
+</body>
+</html>

@@ -1,3 +1,5 @@
-# Gemfile for GitHub Pages compatibility
+# Local preview on modern Ruby. GitHub Actions still builds with jekyll-build-pages.
 source "https://rubygems.org"
-gem "github-pages", group: :jekyll_plugins
+
+gem "jekyll", "~> 4.4"
+gem "kramdown-parser-gfm"
