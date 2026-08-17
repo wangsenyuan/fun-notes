@@ -8,6 +8,8 @@ A **Vision-Language-Action (VLA)** model is a single neural net that takes camer
 
 If you already know VLMs (GPT-4o, PaliGemma, LLaVA): a VLA is a VLM that learned to **speak robot actions** instead of only speaking text.
 
+**Want official beginner docs next?** See the [VLA beginner reading list]({{ site.baseurl }}/notes/2026-08-17-vla-beginner-docs/) (LeRobot course, ACT, then SmolVLA).
+
 ![VLA pipeline]({{ site.baseurl }}/assets/vla-pipeline.svg)
 
 ---
@@ -217,10 +219,10 @@ If those three match your robot, fine-tuning is plausible. If they do not, you a
 
 ## 10. Where to go next
 
+- **Beginner docs** — [curated reading list]({{ site.baseurl }}/notes/2026-08-17-vla-beginner-docs/): Hugging Face Robotics Course, LeRobot install/cheat sheet, ACT, then SmolVLA
 - RT-2 paper — why action tokens + web VLMs generalize
 - OpenVLA — open 7B recipe, LoRA fine-tuning, OXE
 - π0 — flow-matching action expert, high-rate chunks
-- Hugging Face LeRobot docs / policies — the implementation layer you will actually run
 - Open X-Embodiment — what “cross-robot pretraining data” looks like
 
 For this notes repo, the takeaway is small: **a VLA is a language-conditioned visuomotor policy built on a pretrained VLM.** Everything else — tokens vs flow, chunking, LoRA, OXE — is how that idea is made fast and trainable on a real arm.
